@@ -269,7 +269,6 @@ object Factory : ViewModelProvider.Factory {
     val userModel: UserModel = UserModel()
     val notificationModel: NotificationModel = NotificationModel(userModel)
     val tripModel: TripModel = TripModel(userModel)
-    val authModel: AuthRepository = AuthRepository()
 
     override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
         return when {
@@ -289,7 +288,7 @@ object Factory : ViewModelProvider.Factory {
                 ReviewTripScreenViewModel(tripModel, userModel, notificationModel) as T
 
             modelClass.isAssignableFrom(UserProfileScreenViewModel::class.java) ->
-                UserProfileScreenViewModel(tripModel, userModel, authModel) as T
+                UserProfileScreenViewModel(tripModel, userModel) as T
 
             modelClass.isAssignableFrom(NotificationsViewModel::class.java) ->
                 NotificationsViewModel(notificationModel, tripModel, userModel) as T
