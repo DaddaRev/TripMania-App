@@ -571,6 +571,8 @@ object Utility {
                         "Arrival and Welcome Dinner",
                         LocalDate.of(2025, 11, 5),
                         "Auckland",
+                        null,
+                        null,
                         true,
                         "Traditional Maori feast"
                     ),
@@ -578,6 +580,8 @@ object Utility {
                         "Rotorua Adventure",
                         LocalDate.of(2025, 11, 6),
                         "Rotorua",
+                        null,
+                        null,
                         false,
                         "Geothermal parks, Maori villages"
                     ),
@@ -585,6 +589,8 @@ object Utility {
                         "Queenstown Thrills",
                         LocalDate.of(2025, 11, 8),
                         "Queenstown",
+                        null,
+                        null,
                         false,
                         "Bungee jumping, skydiving"
                     ),
@@ -592,6 +598,8 @@ object Utility {
                         "Relax in Hot Springs",
                         LocalDate.of(2025, 11, 10),
                         "Hanmer Springs",
+                        null,
+                        null,
                         true,
                         "Thermal pools"
                     )
@@ -679,6 +687,8 @@ object Utility {
                         "Arrival in Marrakech",
                         LocalDate.of(2023, 3, 10),
                         "Marrakech",
+                        null,
+                        null,
                         true,
                         "Welcome dinner and traditional music show"
                     ),
@@ -686,6 +696,8 @@ object Utility {
                         "Explore Fes Medina",
                         LocalDate.of(2023, 3, 12),
                         "Fes",
+                        null,
+                        null,
                         false,
                         "Walking tour of the old city and tanneries"
                     ),
@@ -693,6 +705,8 @@ object Utility {
                         "Sahara Desert Experience",
                         LocalDate.of(2023, 3, 15),
                         "Merzouga",
+                        null,
+                        null,
                         false,
                         "Camel trek and night under the stars in Berber tents"
                     ),
@@ -700,6 +714,8 @@ object Utility {
                         "Relax in Essaouira",
                         LocalDate.of(2023, 3, 18),
                         "Essaouira",
+                        null,
+                        null,
                         true,
                         "Seafood tasting and coastal walk"
                     )
@@ -775,6 +791,8 @@ object Utility {
                         "Arrival in Tokyo",
                         LocalDate.of(2025, 3, 20),
                         "Tokyo",
+                        null,
+                        null,
                         true,
                         "Explore Shibuya and Asakusa"
                     ),
@@ -782,6 +800,8 @@ object Utility {
                         "Kyoto Temples",
                         LocalDate.of(2025, 3, 22),
                         "Kyoto",
+                        null,
+                        null,
                         false,
                         "Kinkaku-ji, Fushimi Inari Shrine"
                     ),
@@ -789,6 +809,8 @@ object Utility {
                         "Nara Deer Park",
                         LocalDate.of(2025, 3, 24),
                         "Nara",
+                        null,
+                        null,
                         true,
                         "Feed the sacred deer"
                     ),
@@ -796,6 +818,8 @@ object Utility {
                         "Mt. Fuji Excursion",
                         LocalDate.of(2025, 3, 26),
                         "Fuji Five Lakes",
+                        null,
+                        null,
                         false,
                         "Hiking and sightseeing"
                     )
@@ -876,6 +900,8 @@ object Utility {
                         "Arrival in Rome",
                         LocalDate.of(2025, 5, 10),
                         "Rome",
+                        null,
+                        null,
                         true,
                         "Visit the Colosseum and Roman Forum"
                     ),
@@ -883,6 +909,8 @@ object Utility {
                         "Florence Art Tour",
                         LocalDate.of(2025, 5, 12),
                         "Florence",
+                        null,
+                        null,
                         false,
                         "Uffizi Gallery, Duomo Cathedral"
                     ),
@@ -890,6 +918,8 @@ object Utility {
                         "Venetian Canals",
                         LocalDate.of(2025, 5, 15),
                         "Venice",
+                        null,
+                        null,
                         true,
                         "Gondola ride, Piazza San Marco"
                     ),
@@ -897,6 +927,8 @@ object Utility {
                         "Tuscany Wine Tasting",
                         LocalDate.of(2025, 5, 17),
                         "Chianti Region",
+                        null,
+                        null,
                         false,
                         "Vineyard tour and tasting"
                     )
@@ -977,6 +1009,8 @@ object Utility {
                         "Arrival in Nairobi",
                         LocalDate.of(2025, 7, 2),
                         "Nairobi",
+                        null,
+                        null,
                         true,
                         "Explore local markets and museums"
                     ),
@@ -984,6 +1018,8 @@ object Utility {
                         "Maasai Mara Safari",
                         LocalDate.of(2025, 7, 4),
                         "Maasai Mara",
+                        null,
+                        null,
                         false,
                         "Game drives, big five sightings"
                     ),
@@ -991,6 +1027,8 @@ object Utility {
                         "Lake Nakuru Visit",
                         LocalDate.of(2025, 7, 7),
                         "Lake Nakuru",
+                        null,
+                        null,
                         true,
                         "Flamingo watching, rhino sanctuary"
                     ),
@@ -998,6 +1036,8 @@ object Utility {
                         "Amboseli National Park",
                         LocalDate.of(2025, 7, 9),
                         "Amboseli",
+                        null,
+                        null,
                         false,
                         "Mt. Kilimanjaro backdrop photos"
                     )
@@ -1078,6 +1118,8 @@ object Utility {
                         "Start in San Francisco",
                         LocalDate.of(2025, 8, 1),
                         "San Francisco",
+                        null,
+                        null,
                         true,
                         "Golden Gate Bridge, Alcatraz"
                     ),
@@ -1085,6 +1127,8 @@ object Utility {
                         "Yosemite National Park",
                         LocalDate.of(2025, 8, 4),
                         "Yosemite",
+                        null,
+                        null,
                         false,
                         "Hiking and sightseeing"
                     ),
@@ -1092,6 +1136,8 @@ object Utility {
                         "Los Angeles Exploration",
                         LocalDate.of(2025, 8, 8),
                         "Los Angeles",
+                        null,
+                        null,
                         true,
                         "Hollywood, Santa Monica"
                     ),
@@ -1099,6 +1145,8 @@ object Utility {
                         "Grand Canyon Visit",
                         LocalDate.of(2025, 8, 14),
                         "Grand Canyon",
+                        null,
+                        null,
                         false,
                         "Sunset at the South Rim"
                     )
@@ -1190,6 +1238,8 @@ object Utility {
                         "Arrival at Resort",
                         LocalDate.of(2025, 12, 5),
                         "Male",
+                        null,
+                        null,
                         true,
                         "Relaxation and welcome drinks"
                     ),
@@ -1197,6 +1247,8 @@ object Utility {
                         "Snorkeling Adventure",
                         LocalDate.of(2025, 12, 6),
                         "Coral Reefs",
+                        null,
+                        null,
                         false,
                         "Snorkel among tropical fish"
                     ),
@@ -1204,6 +1256,8 @@ object Utility {
                         "Spa and Wellness Day",
                         LocalDate.of(2025, 12, 8),
                         "Resort Spa",
+                        null,
+                        null,
                         true,
                         "Massages and wellness treatments"
                     ),
@@ -1211,6 +1265,8 @@ object Utility {
                         "Island Hopping",
                         LocalDate.of(2025, 12, 10),
                         "Various Islands",
+                        null,
+                        null,
                         false,
                         "Explore nearby islands by boat"
                     )
@@ -1280,6 +1336,8 @@ object Utility {
                         "Arrival in Lima",
                         LocalDate.of(2025, 9, 10),
                         "Lima",
+                        null,
+                        null,
                         true,
                         "City tour and local food tasting"
                     ),
@@ -1287,6 +1345,8 @@ object Utility {
                         "Cusco & Sacred Valley",
                         LocalDate.of(2025, 9, 12),
                         "Cusco",
+                        null,
+                        null,
                         false,
                         "Visit ruins and local markets"
                     ),
@@ -1294,6 +1354,8 @@ object Utility {
                         "Machu Picchu Visit",
                         LocalDate.of(2025, 9, 15),
                         "Machu Picchu",
+                        null,
+                        null,
                         false,
                         "Guided tour of the ancient city"
                     ),
@@ -1301,6 +1363,8 @@ object Utility {
                         "Uyuni Salt Flats",
                         LocalDate.of(2025, 9, 20),
                         "Uyuni",
+                        null,
+                        null,
                         false,
                         "4x4 tour across the salt flats"
                     )
@@ -1387,6 +1451,8 @@ object Utility {
                         "Arrival in Oslo",
                         LocalDate.of(2025, 2, 5),
                         "Oslo",
+                        null,
+                        null,
                         true,
                         "Viking Museum and city sightseeing"
                     ),
@@ -1394,6 +1460,8 @@ object Utility {
                         "Northern Lights in Tromsø",
                         LocalDate.of(2025, 2, 7),
                         "Tromsø",
+                        null,
+                        null,
                         false,
                         "Northern lights safari"
                     ),
@@ -1401,6 +1469,8 @@ object Utility {
                         "Train to Sweden",
                         LocalDate.of(2025, 2, 10),
                         "Kiruna",
+                        null,
+                        null,
                         true,
                         "Ice hotel visit and dog sledding"
                     ),
@@ -1408,6 +1478,8 @@ object Utility {
                         "Stockholm Exploration",
                         LocalDate.of(2025, 2, 13),
                         "Stockholm",
+                        null,
+                        null,
                         false,
                         "Gamla Stan and Vasa Museum"
                     )

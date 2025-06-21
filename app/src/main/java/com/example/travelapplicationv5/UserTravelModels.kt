@@ -131,7 +131,9 @@
             date = date,
             location = data["location"] as? String ?: "",
             free = data["free"] as? Boolean ?: true,
-            activities = (data["activities"] as? List<String>)?.joinToString(", ") ?: ""
+            activities = (data["activities"] as? List<String>)?.joinToString(", ") ?: "",
+            latitude = (data["latitude"] as? Double),
+            longitude = (data["longitude"] as? Double)
         )
     }
 
@@ -227,7 +229,9 @@
                     "date" to stop.date.toTimestamp(),
                     "location" to stop.location,
                     "free" to stop.free,
-                    "activities" to stop.activities
+                    "activities" to stop.activities,
+                    "latitude" to stop.latitude,
+                    "longitude" to stop.longitude
                 )
             },
             "requests" to trip.requests.map { req ->
@@ -644,6 +648,8 @@
         var title: String,
         var date: LocalDate,
         var location: String,
+        var latitude: Double? = null,
+        var longitude: Double? = null,
         var free: Boolean,
         var activities: String,
     ) : Parcelable {
@@ -651,6 +657,8 @@
             title = title,
             date = date,
             location = location,
+            latitude = null,
+            longitude = null,
             free = true,
             activities = "",
         )

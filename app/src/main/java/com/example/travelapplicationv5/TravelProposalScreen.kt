@@ -68,6 +68,7 @@ import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Map
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarHalf
 import androidx.compose.material.icons.filled.StarOutline
@@ -614,6 +615,7 @@ fun TripSection(navController: NavController, vm: TravelProposalScreenViewModel 
     val isLogged by vm.isUserLoggedIn.collectAsState()
     val userId by vm.userId.collectAsState()
 
+    val context = LocalContext.current
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
@@ -798,6 +800,21 @@ fun TripSection(navController: NavController, vm: TravelProposalScreenViewModel 
                             fontSize = 12.sp,
                             color = Color.Black
                         )
+                    }
+                }
+                item {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Button(
+                        onClick = {
+                            UtilityMaps.openTripItinerary(context, trip.itinerary)
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp)
+                    ) {
+                        Icon(Icons.Default.Map, contentDescription = "Map", modifier = Modifier.size(18.dp))
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Map")
                     }
                 }
             }

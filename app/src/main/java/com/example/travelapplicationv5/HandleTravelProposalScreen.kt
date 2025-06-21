@@ -5,7 +5,6 @@ import android.app.DatePickerDialog
 import android.content.Context
 import android.content.res.Configuration
 import android.net.Uri
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -88,9 +87,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
@@ -100,6 +97,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 import kotlin.collections.plus
 import kotlin.math.roundToInt
 
@@ -1309,7 +1307,8 @@ fun EditStop(
                 OutlinedTextField(
                     value = location,
                     onValueChange = { location = it },
-                    label = { Text("Location") }
+                    label = { Text("Location") },
+                    placeholder = { Text("Uffizi Gallery, Florence, Italy") }
                 )
                 Spacer(Modifier.height(6.dp))
                 Button(
@@ -1341,11 +1340,15 @@ fun EditStop(
         },
         confirmButton = {
             Button(onClick = {
+                val coords = UtilityMaps.getLatLngFromLocationName(context, location, Locale.ENGLISH)
+                    ?: UtilityMaps.getLatLngFromLocationName(context, location, Locale("it"))
                 onSave(
                     stop.copy(
                         title = title,
                         date = date,
                         location = location,
+                        latitude = coords?.first,
+                        longitude = coords?.second,
                         free = free,
                         activities = activities
                     )
