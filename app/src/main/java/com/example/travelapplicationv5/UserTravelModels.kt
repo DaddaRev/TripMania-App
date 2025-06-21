@@ -75,7 +75,9 @@
             phoneNumber = data["phoneNumber"] as? String ?: "",
             email = data["email"] as? String ?: "",
             dateOfBirth = dateOfBirth,
-            preferences = (data["preferences"] as? Map<String, List<String>>) ?: emptyMap()
+            preferences = (data["preferences"] as? Map<String, List<String>>) ?: emptyMap(),
+            tripsCreated = (data["tripsCreated"] as? Long)?.toInt() ?: 0,
+            currentBadge = data["currentBadge"] as? String
         )
     }
 
@@ -204,7 +206,9 @@
             "phoneNumber" to user.phoneNumber,
             "email" to user.email,
             "dateOfBirth" to user.dateOfBirth.toTimestamp(),
-            "preferences" to user.preferences
+            "preferences" to user.preferences,
+            "tripsCreated" to user.tripsCreated,
+            "currentBadge" to user.currentBadge
         )
     }
 
@@ -294,20 +298,27 @@
         var phoneNumber: String,
         var email: String,
         var dateOfBirth: LocalDate,
-        var preferences: Map<String, List<String>>
+        var preferences: Map<String, List<String>>,
+        var tripsCreated: Int,
+        var currentBadge: String?
     ) : Parcelable {
-        constructor() : this(0, "", "", "", null, null, false, "", "", LocalDate.now(), emptyMap())
+        constructor() : this(0, "", "", "", null, null, false, "", "", LocalDate.now(), emptyMap(), 0, null)
     }
     enum class UserBadge(
         val displayName: String,
         val iconResId: Int,
         val minTrips: Int,
-        val color: androidx.compose.ui.graphics.Color // Aggiungi questa proprietà
+        val color: Color
     ) {
         NOVICE("Novice Traveler", R.drawable.badge_novice, 1, Color(0xFFB3E5FC)),
         EXPLORER("Explorer", R.drawable.badge_explorer, 3, Color(0xFF4CAF50)),
         TRAVEL_GURU("Travel Guru", R.drawable.badge_guru, 5, Color(0xFF2196F3)),
-        TRAVEL_LEGEND("Travel legend", R.drawable.badge_legend, 10, Color(0xFFFF9800))
+        TRAVEL_LEGEND("Travel legend", R.drawable.badge_legend, 10, Color(0xFFFF9800));
+        companion object {
+            fun fromString(name: String?): UserBadge {
+                return values().find { it.name == name } ?: NOVICE
+            }
+        }
     }
     //User model class
     class UserModel {
@@ -362,7 +373,9 @@
                 userProfile.phoneNumber,
                 userProfile.email,
                 stringToLocalDate(userProfile.dateOfBirth)!!,
-                newPreferences
+                newPreferences,
+                tripsCreated = 0,
+                currentBadge = UserBadge.NOVICE.name
             )
             addUserProfile(newUser)
             _isUserLoggedIn.value = true
@@ -901,13 +914,43 @@
             val tripData = tripToFirebase(newTrip)
             Collections.trips.add(tripData)
                 .addOnSuccessListener {
-                    println("Viaggio aggiunto con successo a Firebase con ID: ${it.id}")
+                        docRef ->
+                    // Incrementa il contatore dei viaggi creati dall'autore
+                    updateUserTripCount(newTrip.author.id)
+                    println("Viaggio aggiunto con successo a Firebase con ID: ${docRef.id}")
                 }
                 .addOnFailureListener { e ->
                     println("Errore nell'aggiunta del viaggio a Firebase: ${e.message}")
                 }
         }
+        private fun updateUserTripCount(userId: Int) {
+            val userDocQuery = Collections.users.whereEqualTo("id", userId).limit(1)
+            userDocQuery.get().addOnSuccessListener { querySnapshot ->
+                val doc = querySnapshot.documents.firstOrNull()
+                if (doc != null) {
+                    val currentCount = (doc.get("tripsCreated") as? Long)?.toInt() ?: 0
+                    val newCount = currentCount + 1
+                    val newBadge = determineBadge(newCount).name
 
+                    doc.reference.update(
+                        mapOf(
+                            "tripsCreated" to newCount,
+                            "currentBadge" to newBadge
+                        )
+                    ).addOnSuccessListener {
+                        Log.d("TripModel", "Contatore viaggi aggiornato per utente $userId")
+                    }
+                }
+            }
+        }
+        private fun determineBadge(tripsCount: Int): UserBadge {
+            return when {
+                tripsCount >= UserBadge.TRAVEL_LEGEND.minTrips -> UserBadge.TRAVEL_LEGEND
+                tripsCount >= UserBadge.TRAVEL_GURU.minTrips -> UserBadge.TRAVEL_GURU
+                tripsCount >= UserBadge.EXPLORER.minTrips -> UserBadge.EXPLORER
+                else -> UserBadge.NOVICE
+            }
+        }
         fun updateTrip(trip: Trip) {
             Collections.trips
                 .whereEqualTo("id", trip.id)

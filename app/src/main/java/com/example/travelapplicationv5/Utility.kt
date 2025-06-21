@@ -223,7 +223,9 @@ object Utility {
             "Activity" to listOf("shopping"),
             "Transport" to listOf("train"),
             "Accomodation" to listOf("hotel")
-        )
+        ),
+        tripsCreated = 5,
+        currentBadge = UserBadge.TRAVEL_GURU.name
     )
 
     val user2 = UserProfile(
@@ -243,7 +245,9 @@ object Utility {
             "Activity" to listOf("adventure", "relax"),
             "Transport" to listOf("bus", "car"),
             "Accomodation" to listOf("campsite", "hostel")
-        )
+        ),
+        tripsCreated = 1,
+        currentBadge = UserBadge.NOVICE.name
     )
 
     val user3 = UserProfile(
@@ -263,7 +267,9 @@ object Utility {
             "Activity" to listOf("culture"),
             "Transport" to listOf("plane"),
             "Accomodation" to listOf("resort")
-        )
+        ),
+        tripsCreated = 2,
+        currentBadge = UserBadge.EXPLORER.name
     )
 
     val user4 = UserProfile(
@@ -283,7 +289,9 @@ object Utility {
             "Activity" to listOf("relax"),
             "Transport" to listOf("car"),
             "Accomodation" to listOf("apartment", "hostel")
-        )
+        ),
+        tripsCreated = 0,
+        currentBadge = UserBadge.NOVICE.name
     )
 
     val user5 = UserProfile(
@@ -303,7 +311,9 @@ object Utility {
             "Activity" to listOf("shopping", "adventure"),
             "Transport" to listOf("bus"),
             "Accomodation" to listOf("resort", "hotel")
-        )
+        ),
+        tripsCreated = 0,
+        currentBadge = UserBadge.NOVICE.name
     )
 
     val user6 = UserProfile(
@@ -323,7 +333,9 @@ object Utility {
             "Activity" to listOf("culture", "relax"),
             "Transport" to listOf("train", "car"),
             "Accomodation" to listOf("apartment")
-        )
+        ),
+        tripsCreated = 0,
+        currentBadge = UserBadge.NOVICE.name
     )
 
     val user7 = UserProfile(
@@ -343,7 +355,9 @@ object Utility {
             "Activity" to listOf("adventure"),
             "Transport" to listOf("car"),
             "Accomodation" to listOf("campsite")
-        )
+        ),
+        tripsCreated = 0,
+        currentBadge = UserBadge.NOVICE.name
     )
 
     val user8 = UserProfile(
@@ -363,7 +377,9 @@ object Utility {
             "Activity" to listOf("culture", "shopping"),
             "Transport" to listOf("plane", "bus"),
             "Accomodation" to listOf("hotel", "resort")
-        )
+        ),
+        tripsCreated = 1,
+        currentBadge = UserBadge.NOVICE.name
     )
 
     val user9 = UserProfile(
@@ -383,7 +399,9 @@ object Utility {
             "Activity" to listOf("relax", "shopping"),
             "Transport" to listOf("train"),
             "Accomodation" to listOf("resort", "apartment")
-        )
+        ),
+        tripsCreated = 0,
+        currentBadge = UserBadge.NOVICE.name
     )
 
     val user10 = UserProfile(
@@ -403,7 +421,9 @@ object Utility {
             "Activity" to listOf("adventure", "culture"),
             "Transport" to listOf("car"),
             "Accomodation" to listOf("hostel")
-        )
+        ),
+        tripsCreated = 0,
+        currentBadge = UserBadge.NOVICE.name
     )
 
     fun generateUsers(): List<UserProfile> {

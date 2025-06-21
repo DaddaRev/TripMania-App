@@ -276,9 +276,14 @@ class UserProfileScreenViewModel(
         "Accomodation" to Icons.Default.Home
     )
 
-    fun getUserBadge(userId: Int): UserBadge {
-        val tripsCount = groupedTrips.value.own.size
 
+    fun getUserBadge(userProfile: UserProfile): UserBadge {
+        return userProfile.currentBadge?.let { badgeName ->
+            UserBadge.fromString(badgeName)
+        } ?: determineBadgeFromTrips(userProfile.id)
+    }
+    private fun determineBadgeFromTrips(userId: Int): UserBadge {
+        val tripsCount = groupedTrips.value.own.size
         return when {
             tripsCount >= UserBadge.TRAVEL_LEGEND.minTrips -> UserBadge.TRAVEL_LEGEND
             tripsCount >= UserBadge.TRAVEL_GURU.minTrips -> UserBadge.TRAVEL_GURU
@@ -629,10 +634,13 @@ class UserProfileScreenViewModel(
 }
 
 @Composable
-fun UserBadgeDisplay(badge: UserBadge) {
+fun UserBadgeDisplay(userProfile: UserProfile) {
+    val badge = remember(userProfile) {
+        UserBadge.fromString(userProfile.currentBadge)
+    }
+
     Box(
         modifier = Modifier
-            .padding(4.dp)
             .background(badge.color, RoundedCornerShape(16.dp))
             .padding(horizontal = 8.dp, vertical = 4.dp)
     ) {
@@ -643,7 +651,7 @@ fun UserBadgeDisplay(badge: UserBadge) {
                 modifier = Modifier.size(16.dp),
                 tint = Color.White
             )
-            Spacer(modifier = Modifier.width(4.dp))
+            Spacer(Modifier.width(4.dp))
             Text(
                 text = badge.displayName,
                 color = Color.White,
@@ -652,7 +660,6 @@ fun UserBadgeDisplay(badge: UserBadge) {
         }
     }
 }
-
 @Composable
 fun DisplayUserScreen(
     navController: NavController,
@@ -1130,7 +1137,6 @@ fun UserInfoColumn(
     val isSelf by viewModel.isSelf.collectAsState()
     val userProfile by viewModel.userProfile.collectAsState()
     val allTrips by viewModel.travelProposalsList.collectAsState()
-    val badge = viewModel.getUserBadge(userProfile.id)
 
     Column(
         modifier = Modifier
@@ -1220,7 +1226,7 @@ fun UserInfoColumn(
         Spacer(Modifier.height(5.dp))
 
         //badge
-        UserBadgeDisplay(badge = badge)
+        UserBadgeDisplay(userProfile = userProfile)
 
         Row(
             modifier = Modifier
