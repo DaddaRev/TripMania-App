@@ -3,8 +3,8 @@
     import android.net.Uri
     import android.os.Parcelable
     import android.util.Log
+    import androidx.compose.ui.graphics.Color
     import com.example.travelapplicationv5.Factory.notificationModel
-    import com.example.travelapplicationv5.UserProfile
     import com.example.travelapplicationv5.Utility.generateUsers
     import com.google.firebase.firestore.FirebaseFirestore
     import kotlinx.android.parcel.Parcelize
@@ -187,7 +187,8 @@
                     it,
                     users
                 )
-            } ?: emptyList()
+            } ?: emptyList(),
+            telegramLink = data["telegramLink"] as? String
         )
     }
 
@@ -253,7 +254,8 @@
                     "rating" to rev.rating.toLong(),
                     "body" to rev.body
                 )
-            }
+            },
+            "telegramLink" to trip.telegramLink
         )
     }
 
@@ -296,7 +298,17 @@
     ) : Parcelable {
         constructor() : this(0, "", "", "", null, null, false, "", "", LocalDate.now(), emptyMap())
     }
-
+    enum class UserBadge(
+        val displayName: String,
+        val iconResId: Int,
+        val minTrips: Int,
+        val color: androidx.compose.ui.graphics.Color // Aggiungi questa proprietà
+    ) {
+        NOVICE("Novice Traveler", R.drawable.badge_novice, 1, Color(0xFFB3E5FC)),
+        EXPLORER("Explorer", R.drawable.badge_explorer, 3, Color(0xFF4CAF50)),
+        TRAVEL_GURU("Travel Guru", R.drawable.badge_guru, 5, Color(0xFF2196F3)),
+        TRAVEL_LEGEND("Travel legend", R.drawable.badge_legend, 10, Color(0xFFFF9800))
+    }
     //User model class
     class UserModel {
         //private val _usersList = MutableStateFlow<List<UserProfile>>(Utility.generateUsers())
@@ -721,7 +733,8 @@
         var itinerary: List<Stop>,
         var requests: List<Request>,
         var reviews: List<Review>,
-        var memberReviews: List<MemberReview>
+        var memberReviews: List<MemberReview>,
+        val telegramLink: String? = null
     ) : Parcelable {
         constructor() : this(
             id = 0,

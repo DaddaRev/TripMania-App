@@ -276,6 +276,17 @@ class UserProfileScreenViewModel(
         "Accomodation" to Icons.Default.Home
     )
 
+    fun getUserBadge(userId: Int): UserBadge {
+        val tripsCount = groupedTrips.value.own.size
+
+        return when {
+            tripsCount >= UserBadge.TRAVEL_LEGEND.minTrips -> UserBadge.TRAVEL_LEGEND
+            tripsCount >= UserBadge.TRAVEL_GURU.minTrips -> UserBadge.TRAVEL_GURU
+            tripsCount >= UserBadge.EXPLORER.minTrips -> UserBadge.EXPLORER
+            else -> UserBadge.NOVICE
+        }
+    }
+
     // **************** AUTH Features ****************
     // We retrieve the status of the log-in (true/false)
     val isUserLoggedIn = userModel.isUserLoggedIn
@@ -615,6 +626,31 @@ class UserProfileScreenViewModel(
             return false
     }
 
+}
+
+@Composable
+fun UserBadgeDisplay(badge: UserBadge) {
+    Box(
+        modifier = Modifier
+            .padding(4.dp)
+            .background(badge.color, RoundedCornerShape(16.dp))
+            .padding(horizontal = 8.dp, vertical = 4.dp)
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            Icon(
+                painter = painterResource(id = badge.iconResId),
+                contentDescription = badge.displayName,
+                modifier = Modifier.size(16.dp),
+                tint = Color.White
+            )
+            Spacer(modifier = Modifier.width(4.dp))
+            Text(
+                text = badge.displayName,
+                color = Color.White,
+                style = MaterialTheme.typography.labelSmall
+            )
+        }
+    }
 }
 
 @Composable
@@ -1094,6 +1130,7 @@ fun UserInfoColumn(
     val isSelf by viewModel.isSelf.collectAsState()
     val userProfile by viewModel.userProfile.collectAsState()
     val allTrips by viewModel.travelProposalsList.collectAsState()
+    val badge = viewModel.getUserBadge(userProfile.id)
 
     Column(
         modifier = Modifier
@@ -1181,6 +1218,9 @@ fun UserInfoColumn(
             style = MaterialTheme.typography.titleLarge.copy(color = Color.Gray)
         )
         Spacer(Modifier.height(5.dp))
+
+        //badge
+        UserBadgeDisplay(badge = badge)
 
         Row(
             modifier = Modifier
