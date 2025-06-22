@@ -19,10 +19,13 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
@@ -73,8 +76,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.forEach
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.temporal.ChronoUnit
@@ -281,7 +287,27 @@ class TravelProposalListScreenViewModel(val model: TripModel, val userModel: Use
         _filteredTrips.value = travelProposalsList.value
         println("Reset trips count: ${_filteredTrips.value.size}")  // debug log
     }
+
+    val savedTrips: StateFlow<List<Int>> = combine(
+        userModel.usersList,
+        userModel.loggedUser
+    ) { users, id ->
+        users.find { it.id == id }?.saved ?: emptyList()
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.Lazily,
+        emptyList()
+    )
+
+    fun addSavedTrip(tripId: Int){
+        userModel.addSavedTrip(tripId)
+    }
+
+    fun removeSavedTrip(tripId: Int){
+        userModel.removeSavedTrip(tripId)
+    }
 }
+
 
 @Composable
 fun TravelListScreen(
@@ -295,14 +321,11 @@ fun TravelListScreen(
 
     val isLoggedIn = vmUserProfile.isUserLoggedIn.collectAsState().value
 
-    Log.d("cocco", isLoggedIn.toString())
-
     val filteredTrips = viewModel.filteredTrips.collectAsState().value
     println("TRIPS : " + filteredTrips)
     // Information's related to the portrait mode or not
     val configuration = LocalConfiguration.current
-    val portrait =
-        configuration.orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT
+    val portrait = configuration.orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT
     val itemsPerRow = if (portrait) 2 else 3
 
     Scaffold(
@@ -315,7 +338,6 @@ fun TravelListScreen(
             ) {
                 FloatingActionButton(
                     onClick = {
-                        Log.d("cocco1", isLoggedIn.toString())
                         if (!isLoggedIn) {
                             navController.navigate("login")
                         } else {
@@ -376,7 +398,9 @@ fun TravelListScreen(
                                 modifier = Modifier.weight(1f),
                                 onClick = {
                                     navController.navigate("detail/${trip.id}")
-                                }
+                                },
+                                viewModel = viewModel,
+                                vmUserProfile = vmUserProfile
                             )
                         }
                         // Fill empty spaces if needed
@@ -647,8 +671,14 @@ fun TripSection(
     price: String,
     img: String,
     modifier: Modifier,
-    onClick: (Trip) -> Unit   // lambda to call the composable without using navigation
+    onClick: (Trip) -> Unit,   // lambda to call the composable without using navigation,
+    viewModel: TravelProposalListScreenViewModel,
+    vmUserProfile: UserProfileScreenViewModel
 ) {
+    val savedTrips by viewModel.savedTrips.collectAsState()
+    val isLoggedIn by vmUserProfile.isUserLoggedIn.collectAsState()
+    val loggedUser by vmUserProfile.userId.collectAsState()
+
     Card(
         modifier = modifier
             .padding(horizontal = 2.dp)
@@ -681,6 +711,30 @@ fun TripSection(
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop
                 )
+                if (isLoggedIn && trip.author.id!=loggedUser) {
+                    val isSaved = savedTrips.any{ it == trip.id }
+                    Box(
+                        modifier = Modifier
+                            .align(Alignment.TopEnd)
+                            .padding(end = 6.dp)
+                            .background(
+                                MaterialTheme.colorScheme.surfaceVariant,
+                                shape = RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp)
+                            )
+                            .clickable {
+                                if (isSaved) viewModel.removeSavedTrip(trip.id)
+                                else viewModel.addSavedTrip(trip.id)
+                            }
+                            .padding(2.dp)
+                    ) {
+                        Icon(
+                            imageVector = if (isSaved) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
+                            contentDescription = "Salva",
+                            modifier = Modifier.size(30.dp),
+                            tint = Color.Black
+                        )
+                    }
+                }
             }
             Spacer(Modifier.height(4.dp))
             Text(
@@ -696,3 +750,4 @@ fun TripSection(
         }
     }
 }
+

@@ -223,7 +223,8 @@ object Utility {
             "Activity" to listOf("shopping"),
             "Transport" to listOf("train"),
             "Accomodation" to listOf("hotel")
-        )
+        ),
+        saved = emptyList()
     )
 
     val user2 = UserProfile(
@@ -243,7 +244,8 @@ object Utility {
             "Activity" to listOf("adventure", "relax"),
             "Transport" to listOf("bus", "car"),
             "Accomodation" to listOf("campsite", "hostel")
-        )
+        ),
+        saved = emptyList()
     )
 
     val user3 = UserProfile(
@@ -263,7 +265,8 @@ object Utility {
             "Activity" to listOf("culture"),
             "Transport" to listOf("plane"),
             "Accomodation" to listOf("resort")
-        )
+        ),
+        saved = emptyList()
     )
 
     val user4 = UserProfile(
@@ -283,7 +286,8 @@ object Utility {
             "Activity" to listOf("relax"),
             "Transport" to listOf("car"),
             "Accomodation" to listOf("apartment", "hostel")
-        )
+        ),
+        saved = emptyList()
     )
 
     val user5 = UserProfile(
@@ -303,7 +307,8 @@ object Utility {
             "Activity" to listOf("shopping", "adventure"),
             "Transport" to listOf("bus"),
             "Accomodation" to listOf("resort", "hotel")
-        )
+        ),
+        saved = emptyList()
     )
 
     val user6 = UserProfile(
@@ -323,7 +328,8 @@ object Utility {
             "Activity" to listOf("culture", "relax"),
             "Transport" to listOf("train", "car"),
             "Accomodation" to listOf("apartment")
-        )
+        ),
+        saved = emptyList()
     )
 
     val user7 = UserProfile(
@@ -343,7 +349,8 @@ object Utility {
             "Activity" to listOf("adventure"),
             "Transport" to listOf("car"),
             "Accomodation" to listOf("campsite")
-        )
+        ),
+        saved = emptyList()
     )
 
     val user8 = UserProfile(
@@ -363,7 +370,8 @@ object Utility {
             "Activity" to listOf("culture", "shopping"),
             "Transport" to listOf("plane", "bus"),
             "Accomodation" to listOf("hotel", "resort")
-        )
+        ),
+        saved = emptyList()
     )
 
     val user9 = UserProfile(
@@ -383,7 +391,8 @@ object Utility {
             "Activity" to listOf("relax", "shopping"),
             "Transport" to listOf("train"),
             "Accomodation" to listOf("resort", "apartment")
-        )
+        ),
+        saved = emptyList()
     )
 
     val user10 = UserProfile(
@@ -403,7 +412,8 @@ object Utility {
             "Activity" to listOf("adventure", "culture"),
             "Transport" to listOf("car"),
             "Accomodation" to listOf("hostel")
-        )
+        ),
+        saved = emptyList()
     )
 
     fun generateUsers(): List<UserProfile> {

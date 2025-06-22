@@ -138,6 +138,13 @@ data class UserProfileEditable(
     var dateOfBirth: String = "",
 )
 
+data class GroupedTrips(
+    val planned: List<Trip>,
+    val saved: List<Trip>,
+    val own: List<Trip>,
+    val past: List<Trip>
+)
+
 // ViewModel to manage user profile data
 class UserProfileScreenViewModel(
     val tripModel: TripModel,
@@ -185,13 +192,6 @@ class UserProfileScreenViewModel(
         UserProfile()
     )
 
-    data class GroupedTrips(
-        val planned: List<Trip>,
-        val saved: List<Trip>,
-        val own: List<Trip>,
-        val past: List<Trip>
-    )
-
     val groupedTrips: StateFlow<GroupedTrips> = combine(
         tripModel.travelProposalsList,
         userProfileId
@@ -204,8 +204,17 @@ class UserProfileScreenViewModel(
         } + own
         val planned = joinedTrips.filter { it.date.first.isAfter(LocalDate.now()) }
         val past = joinedTrips.filter { !it.date.first.isAfter(LocalDate.now()) }
+        val profile = userModel.usersList.value.filter { it.id == user }.firstOrNull()
+        var saved = emptyList<Trip>()
+        if (profile!=null){
+            profile.saved.forEach { tripId ->
+                val trip = trips.filter { it.id == tripId }.firstOrNull()
+                if(trip != null)
+                    saved += trip
+            }
+        }
 
-        GroupedTrips(planned, emptyList(), own, past)
+        GroupedTrips(planned, saved, own, past)
     }.stateIn(
         viewModelScope,
         SharingStarted.Lazily,

@@ -59,11 +59,14 @@ import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBackIosNew
+import androidx.compose.material.icons.filled.Bookmark
+import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
@@ -88,6 +91,7 @@ import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil3.compose.rememberAsyncImagePainter
+import io.github.jan.supabase.realtime.Column
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -262,6 +266,25 @@ class TravelProposalScreenViewModel (val model: TripModel, val userModel: UserMo
 
     fun isRemoved(userId: Int) : Boolean {
         return userModel.isRemoved(userId)
+    }
+
+    val savedTrips: StateFlow<List<Int>> = combine(
+        userModel.usersList,
+        userModel.loggedUser
+    ) { users, id ->
+        users.find { it.id == id }?.saved ?: emptyList()
+    }.stateIn(
+        viewModelScope,
+        SharingStarted.Lazily,
+        emptyList()
+    )
+
+    fun addSavedTrip(tripId: Int){
+        userModel.addSavedTrip(tripId)
+    }
+
+    fun removeSavedTrip(tripId: Int){
+        userModel.removeSavedTrip(tripId)
     }
 }
 
@@ -613,22 +636,45 @@ fun TripSection(navController: NavController, vm: TravelProposalScreenViewModel 
     val owned by vm.owned.collectAsState()
     val isLogged by vm.isUserLoggedIn.collectAsState()
     val userId by vm.userId.collectAsState()
+    val savedTrips by vm.savedTrips.collectAsState()
 
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
-    Text(
-        text = trip.title,
-        style = MaterialTheme.typography.titleMedium,
-        color = Color.Black,
-        modifier = Modifier.padding(top = 12.dp)
-    )
-    Text(
-        text = trip.description,
-        style = MaterialTheme.typography.bodySmall,
-        color = Color.Black,
-        modifier = Modifier.padding(top = 5.dp)
-    )
+    Row(modifier = Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = trip.title,
+                style = MaterialTheme.typography.titleMedium,
+                color = Color.Black,
+                modifier = Modifier.padding(top = 12.dp)
+            )
+            Text(
+                text = trip.description,
+                style = MaterialTheme.typography.bodySmall,
+                color = Color.Black,
+                modifier = Modifier.padding(top = 5.dp)
+            )
+        }
+        Column() {
+            if (isLogged && trip.author.id != userId) {
+                val isSaved = savedTrips.any { it == trip.id }
+                IconButton(
+                    onClick = {
+                            if (isSaved) vm.removeSavedTrip(trip.id)
+                            else vm.addSavedTrip(trip.id)
+                    }
+                ) {
+                    Icon(
+                        imageVector = if (isSaved) Icons.Default.Bookmark else Icons.Default.BookmarkBorder,
+                        contentDescription = "Salva",
+                        modifier = Modifier.size(30.dp),
+                        tint = Color.Black
+                    )
+                }
+            }
+        }
+    }
     Box(modifier = Modifier.fillMaxSize()) {
         Row(
             modifier = Modifier.fillMaxWidth()

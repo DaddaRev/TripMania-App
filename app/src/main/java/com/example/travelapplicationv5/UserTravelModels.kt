@@ -23,6 +23,7 @@
     import com.google.firebase.Timestamp
     import com.google.firebase.Firebase
     import com.google.firebase.firestore.Exclude
+    import com.google.firebase.firestore.FieldValue
     import com.google.firebase.firestore.FirebaseFirestoreSettings
     import com.google.firebase.firestore.firestore
     import kotlinx.coroutines.channels.awaitClose
@@ -75,7 +76,8 @@
             phoneNumber = data["phoneNumber"] as? String ?: "",
             email = data["email"] as? String ?: "",
             dateOfBirth = dateOfBirth,
-            preferences = (data["preferences"] as? Map<String, List<String>>) ?: emptyMap()
+            preferences = (data["preferences"] as? Map<String, List<String>>) ?: emptyMap(),
+            saved = (data["saved"] as? List<Int>) ?: emptyList()
         )
     }
 
@@ -203,7 +205,8 @@
             "phoneNumber" to user.phoneNumber,
             "email" to user.email,
             "dateOfBirth" to user.dateOfBirth.toTimestamp(),
-            "preferences" to user.preferences
+            "preferences" to user.preferences,
+            "saved" to user.saved
         )
     }
 
@@ -292,9 +295,10 @@
         var phoneNumber: String,
         var email: String,
         var dateOfBirth: LocalDate,
-        var preferences: Map<String, List<String>>
+        var preferences: Map<String, List<String>>,
+        var saved: List<Int>
     ) : Parcelable {
-        constructor() : this(0, "", "", "", null, null, false, "", "", LocalDate.now(), emptyMap())
+        constructor() : this(0, "", "", "", null, null, false, "", "", LocalDate.now(), emptyMap(), emptyList())
     }
 
     //User model class
@@ -350,7 +354,8 @@
                 userProfile.phoneNumber,
                 userProfile.email,
                 stringToLocalDate(userProfile.dateOfBirth)!!,
-                newPreferences
+                newPreferences,
+                emptyList()
             )
             addUserProfile(newUser)
             _isUserLoggedIn.value = true
@@ -488,6 +493,44 @@
             }
         }
 
+        fun addSavedTrip(tripId: Int) {
+            val userDocQuery = Collections.users.whereEqualTo("id", loggedUser.value).limit(1)
+
+            userDocQuery.get().addOnSuccessListener { querySnapshot ->
+                val doc = querySnapshot.documents.firstOrNull()
+                if (doc != null) {
+                    doc.reference.update("saved", FieldValue.arrayUnion(tripId))
+                        .addOnSuccessListener {
+                            Log.d("UserModel", "Trip saved aggiunto con successo su Firebase")
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e("UserModel", "Errore aggiornamento saved trip su Firebase: ${e.message}")
+                        }
+                }
+            }.addOnFailureListener {
+                Log.e("UserModel", "Errore ricerca utente per aggiornare preferences: ${it.message}")
+            }
+        }
+
+        fun removeSavedTrip(tripId: Int) {
+            val userDocQuery = Collections.users.whereEqualTo("id", loggedUser.value).limit(1)
+
+            userDocQuery.get().addOnSuccessListener { querySnapshot ->
+                val doc = querySnapshot.documents.firstOrNull()
+                if (doc != null) {
+                    doc.reference.update("saved", FieldValue.arrayRemove(tripId))
+                        .addOnSuccessListener {
+                            Log.d("UserModel", "Trip saved rimosso con successo su Firebase")
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e("UserModel", "Errore aggiornamento saved trip su Firebase: ${e.message}")
+                        }
+                }
+            }.addOnFailureListener {
+                Log.e("UserModel", "Errore ricerca utente per aggiornare preferences: ${it.message}")
+            }
+        }
+
     }
 
     //############################################NOTIFICATION##########################################
@@ -519,7 +562,6 @@
         val isLogged = userModel.isUserLoggedIn
 
         fun getNotifications(userId: Int?): Flow<List<Notification>> = callbackFlow {
-            Log.d("DEBUGGINO", "in"+userId.toString())
             val listener = Collections.notifications
                 .whereEqualTo("userId", userId?.toLong())
                 .orderBy("timestamp", Query.Direction.DESCENDING)
@@ -528,7 +570,6 @@
                         val notifications = snapshot.documents.map { not ->
                             not.toObject(Notification::class.java)!!.copy(id = not.id)
                         }
-                        Log.d("DEBUGGINO", notifications.toString())
                         trySend(notifications)
                     } else {
                         Log.e("Firestore", "Error: ${error?.message}")
@@ -568,7 +609,7 @@
             lastMinuteTrips.forEach { trip ->
                 val query = Collections.notifications
                     .whereEqualTo("userId", user.id?.toLong())
-                    .whereEqualTo("tripId", trip.id.toLong())
+                    .whereEqualTo("relatedTripId", trip.id.toLong())
                     .whereEqualTo("type", NotificationType.LAST_MINUTE_PROPOSAL)
 
                 query.get().addOnSuccessListener { snapshot ->
@@ -582,7 +623,7 @@
             recommendedTrips.forEach { trip ->
                 val query = Collections.notifications
                     .whereEqualTo("userId", user.id?.toLong())
-                    .whereEqualTo("tripId", trip.id.toLong())
+                    .whereEqualTo("relatedTripId", trip.id.toLong())
                     .whereEqualTo("type", NotificationType.RECOMMENDED_TRIP)
 
                 query.get().addOnSuccessListener { snapshot ->
