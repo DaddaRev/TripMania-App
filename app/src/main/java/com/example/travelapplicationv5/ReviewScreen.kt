@@ -28,6 +28,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
@@ -159,9 +160,7 @@ class ReviewTripScreenViewModel(val model: TripModel, val userModel: UserModel, 
     }
 
     fun addImage(uri: String) {
-        if (images.size < 3) {
             images.add(uri)
-        }
     }
 
     fun removeImage(uri: String) {
@@ -480,20 +479,21 @@ fun NewReviewScreen(
 //image
 @Composable
 private fun ImageUpload(viewModel: ReviewTripScreenViewModel) {
-    val validationErrors by viewModel.valErrors.collectAsState()
     val imageLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        uri?.let {
-            viewModel.addImage(uri.toString())
-        }
+        contract = ActivityResultContracts.GetMultipleContents()
+    ) { uris: List<Uri> ->
+        val currentImages = viewModel.images
+        val remainingSlots = 5 - currentImages.size
+
+        val newUris = uris.take(remainingSlots).map { it.toString() }
+        newUris.forEach { viewModel.addImage(it) }
     }
 
-    Text("Three images maximum", style = MaterialTheme.typography.titleMedium)
+    Text("Five images maximum", style = MaterialTheme.typography.titleMedium)
     Spacer(modifier = Modifier.height(3.dp))
     BoxWithConstraints(modifier = Modifier.fillMaxWidth()) {
         println(this.maxWidth)
-        val boxWidth = (maxWidth - 16.dp) / 3
+        val boxWidth = (maxWidth - 32.dp) / 5
         val imageHeight = boxWidth * 1.2f
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -505,6 +505,7 @@ private fun ImageUpload(viewModel: ReviewTripScreenViewModel) {
                     modifier = Modifier
                         .width(boxWidth)
                         .height(imageHeight)
+                        .padding(top=5.dp)
                 ) {
                     AsyncImage(
                         model = uri,
@@ -532,7 +533,7 @@ private fun ImageUpload(viewModel: ReviewTripScreenViewModel) {
                 }
             }
 
-            if (viewModel.images.size < 3) {
+            if (viewModel.images.size < 5) {
                 Box(
                     modifier = Modifier
                         .size(80.dp)
@@ -543,7 +544,7 @@ private fun ImageUpload(viewModel: ReviewTripScreenViewModel) {
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector = Icons.Default.Add,
+                        imageVector = Icons.Default.AddCircle,
                         contentDescription = "Add Image",
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(36.dp)
@@ -552,16 +553,6 @@ private fun ImageUpload(viewModel: ReviewTripScreenViewModel) {
             }
         }
     }
-    /*
-    if (validationErrors.image.isNotBlank()) {
-        Text(
-            text = validationErrors.image,
-            color = MaterialTheme.colorScheme.error,
-            style = MaterialTheme.typography.bodySmall
-        )
-    }
-
-     */
 }
 
 //description

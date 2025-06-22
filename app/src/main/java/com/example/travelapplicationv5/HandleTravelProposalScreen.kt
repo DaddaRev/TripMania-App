@@ -1,5 +1,6 @@
 package com.example.travelapplicationv5
 
+import android.app.Activity
 import com.example.travelapplicationv5.Utility.allCountries
 import android.app.DatePickerDialog
 import android.content.Context
@@ -815,11 +816,14 @@ private fun Import(viewModel: HandleTravelProposalScreenViewModel) {
 private fun ImageUpload(viewModel: HandleTravelProposalScreenViewModel) {
     val validationErrors by viewModel.valErrors.collectAsState()
     val imageLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        uri?.let {
-            viewModel.addImage(uri.toString())
-        }
+        contract = ActivityResultContracts.GetMultipleContents()
+    ) {
+        uris: List<Uri> ->
+        val currentImages = viewModel.images
+        val remainingSlots = 3 - currentImages.size
+
+        val newUris = uris.take(remainingSlots).map { it.toString() }
+        newUris.forEach { viewModel.addImage(it) }
     }
 
     Text("Three images", style = MaterialTheme.typography.titleMedium)
