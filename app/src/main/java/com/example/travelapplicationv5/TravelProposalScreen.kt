@@ -1,6 +1,7 @@
 package com.example.travelapplicationv5
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -55,6 +56,7 @@ import androidx.lifecycle.ViewModel
 import coil3.compose.AsyncImage
 import java.time.format.DateTimeFormatter
 import android.content.res.Configuration
+import android.net.Uri
 import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.layout.PaddingValues
@@ -63,11 +65,13 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
+import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.BookmarkBorder
 import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
@@ -629,6 +633,60 @@ fun SwitchSection(vm: TravelProposalScreenViewModel = viewModel(factory = Factor
     }
 }
 
+
+@Composable
+fun TelegramInviteButton(trip: Trip) {
+    val context = LocalContext.current
+
+    // Get the Telegram link from the trip
+    val telegramLink = trip.telegramLink
+
+    // Only show the button if there's a Telegram link
+    if (!telegramLink.isNullOrBlank()) {
+        Button(
+            onClick = {
+                val deepLink = if (telegramLink.startsWith("https://t.me/")) {
+                    // Convert web link to app deep link
+                    "tg://join?invite=${telegramLink.removePrefix("https://t.me/")}"
+                } else if (telegramLink.startsWith("t.me/")) {
+                    // Handle links that might start with just t.me/
+                    "tg://join?invite=${telegramLink.removePrefix("t.me/")}"
+                } else {
+                    // Fallback to using the link as-is
+                    telegramLink
+                }
+
+                val intentApp = Intent(Intent.ACTION_VIEW, Uri.parse(deepLink))
+                val packageManager = context.packageManager
+
+                if (intentApp.resolveActivity(packageManager) != null) {
+                    // Telegram app installed
+                    context.startActivity(intentApp)
+                } else {
+                    // Telegram not installed → fallback to browser
+                    val webLink = if (telegramLink.startsWith("http")) {
+                        telegramLink
+                    } else {
+                        "https://t.me/$telegramLink"
+                    }
+                    val intentWeb = Intent(Intent.ACTION_VIEW, Uri.parse(webLink))
+                    context.startActivity(intentWeb)
+                }
+            },
+            modifier = Modifier
+                .padding(top = 16.dp)
+                .fillMaxWidth()
+        ) {
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.Chat,
+                contentDescription = "Telegram",
+                modifier = Modifier.padding(end = 8.dp)
+            )
+            Text("Join Telegram")
+        }
+    }
+}
+
 @Composable
 fun TripSection(navController: NavController, vm: TravelProposalScreenViewModel = viewModel(factory = Factory)) {
     val trip by vm.tripToShow.collectAsState()
@@ -844,6 +902,11 @@ fun TripSection(navController: NavController, vm: TravelProposalScreenViewModel 
                             color = Color.Black
                         )
                     }
+                }
+                item{
+                        if(vm.isCurrentUserAccepted() || (isLogged && owned)){
+                            TelegramInviteButton(trip = trip)
+                        }
                 }
             }
         }

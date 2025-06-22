@@ -224,6 +224,8 @@ object Utility {
             "Transport" to listOf("train"),
             "Accomodation" to listOf("hotel")
         ),
+        tripsCreated = 5,
+        currentBadge = UserBadge.TRAVEL_GURU.name,
         saved = emptyList()
     )
 
@@ -245,6 +247,8 @@ object Utility {
             "Transport" to listOf("bus", "car"),
             "Accomodation" to listOf("campsite", "hostel")
         ),
+        tripsCreated = 1,
+        currentBadge = UserBadge.NOVICE.name,
         saved = emptyList()
     )
 
@@ -266,6 +270,8 @@ object Utility {
             "Transport" to listOf("plane"),
             "Accomodation" to listOf("resort")
         ),
+        tripsCreated = 2,
+        currentBadge = UserBadge.EXPLORER.name,
         saved = emptyList()
     )
 
@@ -287,6 +293,8 @@ object Utility {
             "Transport" to listOf("car"),
             "Accomodation" to listOf("apartment", "hostel")
         ),
+        tripsCreated = 0,
+        currentBadge = UserBadge.NOVICE.name,
         saved = emptyList()
     )
 
@@ -308,6 +316,8 @@ object Utility {
             "Transport" to listOf("bus"),
             "Accomodation" to listOf("resort", "hotel")
         ),
+        tripsCreated = 0,
+        currentBadge = UserBadge.NOVICE.name,
         saved = emptyList()
     )
 
@@ -329,6 +339,8 @@ object Utility {
             "Transport" to listOf("train", "car"),
             "Accomodation" to listOf("apartment")
         ),
+        tripsCreated = 0,
+        currentBadge = UserBadge.NOVICE.name,
         saved = emptyList()
     )
 
@@ -350,6 +362,8 @@ object Utility {
             "Transport" to listOf("car"),
             "Accomodation" to listOf("campsite")
         ),
+        tripsCreated = 0,
+        currentBadge = UserBadge.NOVICE.name,
         saved = emptyList()
     )
 
@@ -371,6 +385,8 @@ object Utility {
             "Transport" to listOf("plane", "bus"),
             "Accomodation" to listOf("hotel", "resort")
         ),
+        tripsCreated = 1,
+        currentBadge = UserBadge.NOVICE.name,
         saved = emptyList()
     )
 
@@ -392,6 +408,8 @@ object Utility {
             "Transport" to listOf("train"),
             "Accomodation" to listOf("resort", "apartment")
         ),
+        tripsCreated = 0,
+        currentBadge = UserBadge.NOVICE.name,
         saved = emptyList()
     )
 
@@ -413,6 +431,8 @@ object Utility {
             "Transport" to listOf("car"),
             "Accomodation" to listOf("hostel")
         ),
+        tripsCreated = 0,
+        currentBadge = UserBadge.NOVICE.name,
         saved = emptyList()
     )
 

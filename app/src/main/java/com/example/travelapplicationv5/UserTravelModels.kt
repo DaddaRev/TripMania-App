@@ -3,6 +3,7 @@
     import android.net.Uri
     import android.os.Parcelable
     import android.util.Log
+    import androidx.compose.ui.graphics.Color
     import com.example.travelapplicationv5.Factory.notificationModel
     import com.example.travelapplicationv5.UserProfile
     import com.example.travelapplicationv5.Utility.generateUsers
@@ -78,6 +79,8 @@
             email = data["email"] as? String ?: "",
             dateOfBirth = dateOfBirth,
             preferences = (data["preferences"] as? Map<String, List<String>>) ?: emptyMap(),
+            tripsCreated = (data["tripsCreated"] as? Long)?.toInt() ?: 0,
+            currentBadge = data["currentBadge"] as? String,
             saved = (data["saved"] as? List<Int>) ?: emptyList()
         )
     }
@@ -190,7 +193,8 @@
                     it,
                     users
                 )
-            } ?: emptyList()
+            } ?: emptyList(),
+            telegramLink = data["telegramLink"] as? String
         )
     }
 
@@ -207,6 +211,8 @@
             "email" to user.email,
             "dateOfBirth" to user.dateOfBirth.toTimestamp(),
             "preferences" to user.preferences,
+            "tripsCreated" to user.tripsCreated,
+            "currentBadge" to user.currentBadge,
             "saved" to user.saved
         )
     }
@@ -257,7 +263,8 @@
                     "rating" to rev.rating.toLong(),
                     "body" to rev.body
                 )
-            }
+            },
+            "telegramLink" to trip.telegramLink
         )
     }
 
@@ -297,11 +304,28 @@
         var email: String,
         var dateOfBirth: LocalDate,
         var preferences: Map<String, List<String>>,
+        var tripsCreated: Int,
+        var currentBadge: String?,
         var saved: List<Int>
     ) : Parcelable {
-        constructor() : this(0, "", "", "", null, null, false, "", "", LocalDate.now(), emptyMap(), emptyList())
+        constructor() : this(0, "", "", "", null, null, false, "", "", LocalDate.now(), emptyMap(), 0, null, emptyList())
     }
-
+    enum class UserBadge(
+        val displayName: String,
+        val iconResId: Int,
+        val minTrips: Int,
+        val color: Color
+    ) {
+        NOVICE("Novice Traveler", R.drawable.badge_novice, 1, Color(0xFFB3E5FC)),
+        EXPLORER("Explorer", R.drawable.badge_explorer, 3, Color(0xFF4CAF50)),
+        TRAVEL_GURU("Travel Guru", R.drawable.badge_guru, 5, Color(0xFF2196F3)),
+        TRAVEL_LEGEND("Travel legend", R.drawable.badge_legend, 10, Color(0xFFFF9800));
+        companion object {
+            fun fromString(name: String?): UserBadge {
+                return values().find { it.name == name } ?: NOVICE
+            }
+        }
+    }
     //User model class
     class UserModel {
         //private val _usersList = MutableStateFlow<List<UserProfile>>(Utility.generateUsers())
@@ -323,7 +347,6 @@
         fun isRegistered(email: String): UserProfile?{
             if (email=="")
                 return null
-            Log.d("comunismo", _usersList.value.toString())
             return _usersList.value.find { it.email==email }
         }
 
@@ -357,6 +380,8 @@
                 userProfile.email,
                 stringToLocalDate(userProfile.dateOfBirth)!!,
                 newPreferences,
+                tripsCreated = 0,
+                currentBadge = UserBadge.NOVICE.name,
                 emptyList()
             )
             addUserProfile(newUser)
@@ -765,7 +790,8 @@
         var itinerary: List<Stop>,
         var requests: List<Request>,
         var reviews: List<Review>,
-        var memberReviews: List<MemberReview>
+        var memberReviews: List<MemberReview>,
+        val telegramLink: String? = null
     ) : Parcelable {
         constructor() : this(
             id = 0,
@@ -932,13 +958,43 @@
             val tripData = tripToFirebase(newTrip)
             Collections.trips.add(tripData)
                 .addOnSuccessListener {
-                    println("Viaggio aggiunto con successo a Firebase con ID: ${it.id}")
+                        docRef ->
+                    // Incrementa il contatore dei viaggi creati dall'autore
+                    updateUserTripCount(newTrip.author.id)
+                    println("Viaggio aggiunto con successo a Firebase con ID: ${docRef.id}")
                 }
                 .addOnFailureListener { e ->
                     println("Errore nell'aggiunta del viaggio a Firebase: ${e.message}")
                 }
         }
+        private fun updateUserTripCount(userId: Int) {
+            val userDocQuery = Collections.users.whereEqualTo("id", userId).limit(1)
+            userDocQuery.get().addOnSuccessListener { querySnapshot ->
+                val doc = querySnapshot.documents.firstOrNull()
+                if (doc != null) {
+                    val currentCount = (doc.get("tripsCreated") as? Long)?.toInt() ?: 0
+                    val newCount = currentCount + 1
+                    val newBadge = determineBadge(newCount).name
 
+                    doc.reference.update(
+                        mapOf(
+                            "tripsCreated" to newCount,
+                            "currentBadge" to newBadge
+                        )
+                    ).addOnSuccessListener {
+                        Log.d("TripModel", "Contatore viaggi aggiornato per utente $userId")
+                    }
+                }
+            }
+        }
+        private fun determineBadge(tripsCount: Int): UserBadge {
+            return when {
+                tripsCount >= UserBadge.TRAVEL_LEGEND.minTrips -> UserBadge.TRAVEL_LEGEND
+                tripsCount >= UserBadge.TRAVEL_GURU.minTrips -> UserBadge.TRAVEL_GURU
+                tripsCount >= UserBadge.EXPLORER.minTrips -> UserBadge.EXPLORER
+                else -> UserBadge.NOVICE
+            }
+        }
         fun updateTrip(trip: Trip) {
             Collections.trips
                 .whereEqualTo("id", trip.id)

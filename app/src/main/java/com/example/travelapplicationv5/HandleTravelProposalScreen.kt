@@ -113,7 +113,8 @@ data class TripValidationErrors(
     val price: String = "",
     val date: String = "",
     val spots: String = "",
-    val stops: String = ""
+    val stops: String = "",
+    val telegramLink: String = ""
 )
 
 // view model to implement the new travel proposal screen
@@ -140,6 +141,7 @@ class HandleTravelProposalScreenViewModel(val model: TripModel, val userModel :U
         _valErrors.value = TripValidationErrors()
         _valErrorsStep.value = emptyList()
         resetStep()
+        telegramLink = ""
     }
 
     fun loadTripData(mode: String, tripId: Int) {
@@ -162,6 +164,7 @@ class HandleTravelProposalScreenViewModel(val model: TripModel, val userModel :U
             updateEndDate(trip.date.second ?: trip.date.first)
             stops.clear()
             stops.addAll(trip.itinerary)
+            telegramLink = trip.telegramLink ?: ""
             _valErrors.value = TripValidationErrors()
             _valErrorsStep.value = emptyList()
             resetStep()
@@ -258,6 +261,7 @@ class HandleTravelProposalScreenViewModel(val model: TripModel, val userModel :U
     val stops = mutableStateListOf<Stop>()
     private var _startDate by mutableStateOf<LocalDate?>(null)
     private var _endDate by mutableStateOf<LocalDate?>(null)
+    var telegramLink by mutableStateOf("")
 
     //stops functions
     fun addStop() {
@@ -399,6 +403,15 @@ class HandleTravelProposalScreenViewModel(val model: TripModel, val userModel :U
         }
         _valErrors.value = _valErrors.value.copy(stops = error)
     }
+    fun validateTelegramLink(): String {
+        val error = when {
+            telegramLink.isNotBlank() && !telegramLink.startsWith("https://t.me/") ->
+                "Telegram link should start with https://t.me/"
+            else -> ""
+        }
+        _valErrors.value = _valErrors.value.copy(telegramLink = error)
+        return error
+    }
 
     fun validateAll() {
         validateImages()
@@ -409,6 +422,7 @@ class HandleTravelProposalScreenViewModel(val model: TripModel, val userModel :U
         validatePrice()
         validateDates()
         validateStops()
+        validateTelegramLink()
     }
 
     ///######################CREATION OF A NEW TRIP################################
@@ -461,7 +475,8 @@ class HandleTravelProposalScreenViewModel(val model: TripModel, val userModel :U
                 itinerary = stops.toList(),
                 requests = if (mode.value == "edit") tripSource.value.requests else emptyList(),
                 reviews = if (mode.value == "edit") tripSource.value.reviews else emptyList(),
-                memberReviews = if (mode.value == "edit") tripSource.value.memberReviews else emptyList()
+                memberReviews = if (mode.value == "edit") tripSource.value.memberReviews else emptyList(),
+                telegramLink = telegramLink
             )
 
             if (mode.value != "edit") {
@@ -576,6 +591,9 @@ fun NewTravelScreen(
                                 //DESCRIPTION
                                 Spacer(Modifier.height(6.dp))
                                 Description(viewModel)
+                                //TELEGRAM
+                                Spacer(Modifier.height(6.dp))
+                                TelegramLinkField(viewModel)
                                 //COUNTRIES
                                 Spacer(Modifier.height(6.dp))
                                 Countries(viewModel)
@@ -764,6 +782,8 @@ private fun StepTwo(viewModel: HandleTravelProposalScreenViewModel) {
             Title(viewModel)
             Spacer(Modifier.height(20.dp))
             Description(viewModel)
+            Spacer(Modifier.height(20.dp))
+            TelegramLinkField(viewModel)
         }
     }
 }
@@ -1024,6 +1044,30 @@ private fun Countries(viewModel: HandleTravelProposalScreenViewModel) {
     if (validationErrors.countries.isNotBlank()) {
         Text(
             text = validationErrors.countries,
+            color = MaterialTheme.colorScheme.error,
+            style = MaterialTheme.typography.bodySmall
+        )
+    }
+}
+
+
+@Composable
+private fun TelegramLinkField(viewModel: HandleTravelProposalScreenViewModel) {
+    val validationErrors by viewModel.valErrors.collectAsState()
+
+    Text("Telegram Group Link (optional)", style = MaterialTheme.typography.titleMedium)
+    Spacer(Modifier.height(3.dp))
+    OutlinedTextField(
+        value = viewModel.telegramLink,
+        onValueChange = { viewModel.telegramLink = it },
+        label = { Text("https://t.me/yourgroup") },
+        isError = validationErrors.telegramLink.isNotBlank(),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
+        modifier = Modifier.fillMaxWidth()
+    )
+    if (validationErrors.telegramLink.isNotBlank()) {
+        Text(
+            text = validationErrors.telegramLink,
             color = MaterialTheme.colorScheme.error,
             style = MaterialTheme.typography.bodySmall
         )
