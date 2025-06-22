@@ -39,6 +39,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.LaunchedEffect
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
@@ -78,6 +79,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.auth
 import kotlinx.coroutines.launch
 
 
@@ -91,9 +95,30 @@ class MainActivity : ComponentActivity() {
     private val viewModelReview: ReviewTripScreenViewModel by viewModels { Factory }
     private val viewModelNotification: NotificationsViewModel by viewModels { Factory }
 
+    private lateinit var auth: FirebaseAuth  // Call this to check if the user is already authenticated when the app is started
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+
+        auth = Firebase.auth
+        val user = auth.currentUser
+
+        // in this coroutine we check if the user is already logged in (Checking the Firebase.auth istance)
+        lifecycleScope.launch {
+            viewModelUserProfile.userModel.usersList.collect { list ->
+                if (list.isNotEmpty()) {
+                    val user = auth.currentUser
+                    user?.email?.let { email ->
+                        val isRegistered = viewModelUserProfile.isRegistered(email)
+                        if (isRegistered != null) {
+                            viewModelUserProfile.userLogIn(isRegistered)  // Log in the user in our model to update UI
+                        }
+                    }
+                }
+            }
+        }
 
         lifecycleScope.launch {
             SupabaseHandler.anonymousLogin()

@@ -22,6 +22,7 @@
     import java.time.format.DateTimeParseException
     import com.google.firebase.Timestamp
     import com.google.firebase.Firebase
+    import com.google.firebase.auth.auth
     import com.google.firebase.firestore.Exclude
     import com.google.firebase.firestore.FieldValue
     import com.google.firebase.firestore.FirebaseFirestoreSettings
@@ -322,6 +323,7 @@
         fun isRegistered(email: String): UserProfile?{
             if (email=="")
                 return null
+            Log.d("comunismo", _usersList.value.toString())
             return _usersList.value.find { it.email==email }
         }
 
@@ -368,6 +370,7 @@
         }
 
         fun userLogOut() {
+            Firebase.auth.signOut()   // Close the session on firebase
             _isUserLoggedIn.value = false
             _loggedUser.value = null
         }

@@ -24,30 +24,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-// *********************** Authentication repository ***********************************
-class AuthRepository {
-
-    private val firebaseAuth = FirebaseAuth.getInstance()
-    private val _isLoggedIn = MutableStateFlow(firebaseAuth.currentUser != null)
-
-    // LoggedIn variable to check the state from the application's screens
-    val isLoggedIn: StateFlow<Boolean> = _isLoggedIn
-
-    fun signInWithCredential(credential: AuthCredential) {
-    }
-
-    fun signOut() {
-        firebaseAuth.signOut()
-        _isLoggedIn.value = false
-    }
-}
-// ***************************************************************************
 
 class SignInUpActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
     private lateinit var credentialManager: CredentialManager
-    val authRepository = AuthRepository()
 
     override fun onCreate(savedInstanceState: Bundle?) {
 

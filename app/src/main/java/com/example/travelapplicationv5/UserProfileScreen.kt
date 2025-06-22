@@ -149,7 +149,6 @@ data class GroupedTrips(
 class UserProfileScreenViewModel(
     val tripModel: TripModel,
     val userModel: UserModel,
-    val authModel: AuthRepository
 ) : ViewModel() {
 
     val travelProposalsList: StateFlow<List<Trip>> = tripModel.travelProposalsList
@@ -1807,9 +1806,8 @@ fun DeleteDialog(
 fun ProfilePortraitPreview() {
     val userModel = UserModel()
     val tripModel = TripModel(userModel)
-    val authModel = AuthRepository()
 
-    val vm = UserProfileScreenViewModel(tripModel, userModel, authModel)
+    val vm = UserProfileScreenViewModel(tripModel, userModel)
     //ShowProfile(vm, false)
 }
 
@@ -1818,9 +1816,8 @@ fun ProfilePortraitPreview() {
 fun ProfileLandscapePreview() {
     val userModel = UserModel()
     val tripModel = TripModel(userModel)
-    val authModel = AuthRepository()
 
-    val vm = UserProfileScreenViewModel(tripModel, userModel, authModel)
+    val vm = UserProfileScreenViewModel(tripModel, userModel)
 
     //ShowProfile(vm, false)
 }
@@ -1830,9 +1827,8 @@ fun ProfileLandscapePreview() {
 fun MyProfilePortraitPreview() {
     val userModel = UserModel()
     val tripModel = TripModel(userModel)
-    val authModel = AuthRepository()
 
-    val vm = UserProfileScreenViewModel(tripModel, userModel, authModel)
+    val vm = UserProfileScreenViewModel(tripModel, userModel)
     //ShowProfile(vm, true)
 }
 
@@ -1841,9 +1837,8 @@ fun MyProfilePortraitPreview() {
 fun MyProfileLandscapePreview() {
     val userModel = UserModel()
     val tripModel = TripModel(userModel)
-    val authModel = AuthRepository()
 
-    val vm = UserProfileScreenViewModel(tripModel, userModel, authModel)
+    val vm = UserProfileScreenViewModel(tripModel, userModel)
     //ShowProfile(vm, true)
 }
 
@@ -1852,9 +1847,8 @@ fun MyProfileLandscapePreview() {
 fun ProfileTabletPortraitPreview() {
     val userModel = UserModel()
     val tripModel = TripModel(userModel)
-    val authModel = AuthRepository()
 
-    val vm = UserProfileScreenViewModel(tripModel, userModel, authModel)
+    val vm = UserProfileScreenViewModel(tripModel, userModel)
     //ShowProfile(vm, true)
 }
 
@@ -1863,9 +1857,8 @@ fun ProfileTabletPortraitPreview() {
 fun ProfileTabletLandscapePreview() {
     val userModel = UserModel()
     val tripModel = TripModel(userModel)
-    val authModel = AuthRepository()
 
-    val vm = UserProfileScreenViewModel(tripModel, userModel, authModel)
+    val vm = UserProfileScreenViewModel(tripModel, userModel)
     //ShowProfile(vm, true)
 }
 
@@ -1874,9 +1867,8 @@ fun ProfileTabletLandscapePreview() {
 fun MyProfileTabletPortraitPreview() {
     val userModel = UserModel()
     val tripModel = TripModel(userModel)
-    val authModel = AuthRepository()
 
-    val vm = UserProfileScreenViewModel(tripModel, userModel, authModel)
+    val vm = UserProfileScreenViewModel(tripModel, userModel)
     //ShowProfile(vm, true)
 }
 
@@ -1885,8 +1877,7 @@ fun MyProfileTabletPortraitPreview() {
 fun MyProfileTabletLandscapePreview() {
     val userModel = UserModel()
     val tripModel = TripModel(userModel)
-    val authModel = AuthRepository()
 
-    val vm = UserProfileScreenViewModel(tripModel, userModel, authModel)
+    val vm = UserProfileScreenViewModel(tripModel, userModel)
     //ShowProfile(vm, true)
 }
