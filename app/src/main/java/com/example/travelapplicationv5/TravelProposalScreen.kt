@@ -73,6 +73,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.StarHalf
 import androidx.compose.material.icons.filled.StarOutline
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FloatingActionButton
@@ -83,12 +84,14 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil3.compose.rememberAsyncImagePainter
+import com.example.travelapplicationv5.ui.theme.ButtonRed
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -190,10 +193,12 @@ class TravelProposalScreenViewModel (val model: TripModel, val userModel: UserMo
                 url.removePrefix(pathPrefix).takeIf { it.isNotEmpty() }
             }
 
+            /*
             SupabaseHandler.deleteImages(
                 imagePaths = toDeletePaths,
                 bucketName = SupabaseHandler.bucketTrips
             )
+            */
 
             _showDeleteDialog.value = false
             model.removeTrip(trip)
@@ -481,7 +486,7 @@ fun SwitchSection(vm: TravelProposalScreenViewModel = viewModel(factory = Factor
     val sectionSelected by vm.sectionSelected.collectAsState()
 
     Row(
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 30.dp).height(40.dp),
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 30.dp).height(60.dp),
         horizontalArrangement = Arrangement.SpaceEvenly
     ){
         Column( modifier = Modifier.weight(1f)
@@ -498,7 +503,8 @@ fun SwitchSection(vm: TravelProposalScreenViewModel = viewModel(factory = Factor
                 ){
                     Box(modifier = Modifier
                         .size(60.dp, 30.dp)
-                        .background(Color(0xFFD8D4EC), shape = RoundedCornerShape(50))
+                        .background(MaterialTheme.colorScheme.surfaceContainer,
+                            shape = RoundedCornerShape(50))
                     ){
                         Icon(
                             imageVector = Icons.Filled.TravelExplore,
@@ -508,7 +514,11 @@ fun SwitchSection(vm: TravelProposalScreenViewModel = viewModel(factory = Factor
                         )
                     }
                 }
-                Text(text = "Trip", color=Color.Black)
+                Text(
+                    text = "Trip",
+                    style = MaterialTheme.typography.titleMedium,
+                    color=Color.Black
+                )
             }
             else{
                 Row(modifier = Modifier.fillMaxWidth().fillMaxHeight(0.6f),
@@ -522,7 +532,12 @@ fun SwitchSection(vm: TravelProposalScreenViewModel = viewModel(factory = Factor
                         modifier = Modifier.size(20.dp),
                     )
                 }
-                Text(text = "Trip", color=Color.DarkGray)
+                Text(
+                    text = "Trip",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Normal,
+                    color=Color.DarkGray
+                )
             }
         }
         Column( modifier = Modifier.weight(1f)
@@ -538,7 +553,8 @@ fun SwitchSection(vm: TravelProposalScreenViewModel = viewModel(factory = Factor
                 ){
                     Box(modifier = Modifier
                         .size(60.dp, 30.dp)
-                        .background(Color(0xFFD8D4EC), shape = RoundedCornerShape(50))
+                        .background(MaterialTheme.colorScheme.surfaceContainer,
+                            shape = RoundedCornerShape(50))
                     ){
                         Icon(
                             imageVector = Icons.Filled.Reviews,
@@ -548,7 +564,11 @@ fun SwitchSection(vm: TravelProposalScreenViewModel = viewModel(factory = Factor
                         )
                     }
                 }
-                Text(text = "Review", color = Color.Black)
+                Text(
+                    text = "Review",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color.Black
+                )
             }
             else{
                 Row(modifier = Modifier.fillMaxWidth().fillMaxHeight(0.6f),
@@ -562,7 +582,12 @@ fun SwitchSection(vm: TravelProposalScreenViewModel = viewModel(factory = Factor
                         modifier = Modifier.size(20.dp),
                     )
                 }
-                Text(text = "Review", color=Color.DarkGray)
+                Text(
+                    text = "Review",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Normal,
+                    color=Color.DarkGray
+                )
             }
         }
         Column( modifier = Modifier.weight(1f)
@@ -578,7 +603,8 @@ fun SwitchSection(vm: TravelProposalScreenViewModel = viewModel(factory = Factor
                 ){
                     Box(modifier = Modifier
                         .size(60.dp, 30.dp)
-                        .background(Color(0xFFD8D4EC), shape = RoundedCornerShape(50))
+                        .background(MaterialTheme.colorScheme.surfaceContainer,
+                            shape = RoundedCornerShape(50))
                     ){
                         Icon(
                             imageVector = Icons.Filled.Groups,
@@ -588,7 +614,11 @@ fun SwitchSection(vm: TravelProposalScreenViewModel = viewModel(factory = Factor
                         )
                     }
                 }
-                Text(text = "Members", color = Color.Black)
+                Text(
+                    text = "Members",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = Color.Black
+                )
             }
             else{
                 Row(modifier = Modifier.fillMaxWidth().fillMaxHeight(0.6f),
@@ -602,7 +632,12 @@ fun SwitchSection(vm: TravelProposalScreenViewModel = viewModel(factory = Factor
                         modifier = Modifier.size(20.dp),
                     )
                 }
-                Text(text = "Members", color = Color.DarkGray)
+                Text(
+                    text = "Members",
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Normal,
+                    color = Color.DarkGray
+                )
             }
         }
     }
@@ -627,7 +662,7 @@ fun TripSection(navController: NavController, vm: TravelProposalScreenViewModel 
     )
     Text(
         text = trip.description,
-        style = MaterialTheme.typography.bodySmall,
+        style = MaterialTheme.typography.bodyMedium,
         color = Color.Black,
         modifier = Modifier.padding(top = 5.dp)
     )
@@ -694,17 +729,19 @@ fun TripSection(navController: NavController, vm: TravelProposalScreenViewModel 
                             val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
                             val date = trip.itinerary[index].date.format(formatter)
                             Text(
-                                text = "on: " + date + ", at: " + trip.itinerary[index].location,
+                                text = "on: " + date + "\nat: " + trip.itinerary[index].location,
                                 modifier = Modifier.padding(start = 6.dp),
                                 color = Color.Black,
                                 style = MaterialTheme.typography.bodySmall,
                             )
-                            Text(
-                                "activities: " + trip.itinerary[index].activities,
-                                modifier = Modifier.padding(start = 6.dp),
-                                color = Color.Black,
-                                style = MaterialTheme.typography.bodySmall
-                            )
+                            if (trip.itinerary[index].activities.isNotEmpty()) {
+                                Text(
+                                    "activities: " + trip.itinerary[index].activities,
+                                    modifier = Modifier.padding(start = 6.dp),
+                                    color = Color.Black,
+                                    style = MaterialTheme.typography.bodySmall
+                                )
+                            }
                         }
                     }
                 }
@@ -774,7 +811,7 @@ fun TripSection(navController: NavController, vm: TravelProposalScreenViewModel 
                                 text = if (spotsLeft>0) "$spotsLeft free spots" else "no free spots",
                                 fontSize = 12.sp,
                                 color = Color.Black,
-                                style = TextStyle(background = Color(0xFFD8D4EC))
+                                style = TextStyle(background = MaterialTheme.colorScheme.surfaceContainer)
                             )
                             Text(
                                 text = trip.spotsTotal.toString()+ " total spots",
@@ -810,7 +847,11 @@ fun TripSection(navController: NavController, vm: TravelProposalScreenViewModel 
                         },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 12.dp)
+                            .padding(horizontal = 12.dp),
+                        colors = ButtonDefaults.elevatedButtonColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        ),
                     ) {
                         Icon(Icons.Default.Map, contentDescription = "Map", modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(8.dp))
@@ -828,7 +869,7 @@ fun TripSection(navController: NavController, vm: TravelProposalScreenViewModel 
                     .align(Alignment.BottomEnd)
                     .padding(bottom = if (isLandscape) 75.dp else 85.dp)
                     .size(50.dp),
-                containerColor = Color(0xFF0288D1),
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
                 contentColor = Color.White,
             ) {
                 Row(
@@ -849,7 +890,7 @@ fun TripSection(navController: NavController, vm: TravelProposalScreenViewModel 
                     .align(Alignment.BottomEnd)
                     .padding(bottom = if (isLandscape) 20.dp else 30.dp)
                     .size(50.dp),
-                containerColor = Color.Red,
+                containerColor = ButtonRed,
                 contentColor = Color.White,
             ) {
                 Row(
@@ -1208,7 +1249,7 @@ fun MembersSection(navController: NavController, vm: TravelProposalScreenViewMod
                     .align(Alignment.BottomEnd)
                     .padding(bottom = if (isLandscape) 75.dp else 85.dp)
                     .size(50.dp),
-                containerColor = Color(0xFF0288D1),
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
                 contentColor = Color.White,
             ) {
                 Row(
@@ -1375,7 +1416,7 @@ fun ReviewsSection(navController: NavController, vm: TravelProposalScreenViewMod
                     .align(Alignment.BottomEnd)
                     .padding(bottom = if (isLandscape) 75.dp else 85.dp)
                     .size(50.dp),
-                containerColor = Color(0xFF0288D1),
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
                 contentColor = Color.White,
             ) {
                 Row(
@@ -1519,9 +1560,10 @@ fun JoinTripDialog(
                             Icon(
                                 imageVector = Icons.Default.ArrowBackIosNew,
                                 contentDescription = "Decrement",
+                                tint = MaterialTheme.colorScheme.onPrimary,
                                 modifier = Modifier
                                     .background(
-                                        color = MaterialTheme.colorScheme.primary,
+                                        color = MaterialTheme.colorScheme.primaryContainer,
                                         shape = CircleShape
                                     )
                                     .padding(12.dp)
@@ -1542,9 +1584,10 @@ fun JoinTripDialog(
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
                                 contentDescription = "Increment",
+                                tint = MaterialTheme.colorScheme.onPrimary,
                                 modifier = Modifier
                                     .background(
-                                        color = MaterialTheme.colorScheme.primary,
+                                        color = MaterialTheme.colorScheme.primaryContainer,
                                         shape = CircleShape
                                     )
                                     .padding(12.dp)
@@ -1561,7 +1604,11 @@ fun JoinTripDialog(
                         Spacer(modifier = Modifier.width(8.dp))
                         Button(onClick = {
                             vm.confirmJoin(spots)
-                        }) {
+                        },
+                            colors = ButtonDefaults.elevatedButtonColors(
+                                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
+                            )) {
                             Text("Apply")
                         }
                     }
@@ -1589,7 +1636,11 @@ fun DeleteTripDialog(
                     onClick = {
                         vm.confirmDelete()
                         navController.popBackStack()
-                }) {
+                },
+                    colors = ButtonDefaults.elevatedButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),) {
                     Text("Confirm")
                 }
             },
@@ -1620,7 +1671,11 @@ fun LeaveTripDialog(
                 Button(
                     onClick = {
                         vm.confirmLeave()
-                    }) {
+                    },
+                    colors = ButtonDefaults.elevatedButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),) {
                     Text("Confirm")
                 }
             },

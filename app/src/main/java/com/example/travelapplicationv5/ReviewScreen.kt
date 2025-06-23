@@ -70,6 +70,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlin.Int
 import kotlin.collections.plus
 import androidx.compose.material.icons.filled.Cancel
+import com.example.travelapplicationv5.ui.theme.ButtonRed
 import kotlinx.coroutines.launch
 
 
@@ -450,9 +451,9 @@ fun NewReviewScreen(
                                     },
                                     modifier = Modifier.weight(1f),
                                     colors = ButtonDefaults.elevatedButtonColors(
-                                        containerColor = Color.Red,
-                                        contentColor = Color.White
-                                    )
+                                        containerColor = ButtonRed,
+                                        contentColor = MaterialTheme.colorScheme.onSecondary
+                                    ),
                                 ) {
                                     Text("Cancel")
                                 }
@@ -466,6 +467,10 @@ fun NewReviewScreen(
                                         }
                                     },
                                     modifier = Modifier.weight(1f),
+                                    colors = ButtonDefaults.elevatedButtonColors(
+                                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                        contentColor = MaterialTheme.colorScheme.onPrimary
+                                    ),
                                 ) {
                                     Text("Confirm")
                                 }
@@ -545,7 +550,7 @@ private fun ImageUpload(viewModel: ReviewTripScreenViewModel) {
                     Icon(
                         imageVector = Icons.Default.Add,
                         contentDescription = "Add Image",
-                        tint = MaterialTheme.colorScheme.primary,
+                        tint = MaterialTheme.colorScheme.primaryContainer,
                         modifier = Modifier.size(36.dp)
                     )
                 }
@@ -833,9 +838,9 @@ fun NewReviewMembersScreen(
                                     },
                                     modifier = Modifier.weight(1f),
                                     colors = ButtonDefaults.elevatedButtonColors(
-                                        containerColor = Color.Red,
-                                        contentColor = Color.White
-                                    )
+                                        containerColor = ButtonRed,
+                                        contentColor = MaterialTheme.colorScheme.onSecondary
+                                    ),
                                 ) {
                                     Text("Cancel")
                                 }
@@ -849,7 +854,11 @@ fun NewReviewMembersScreen(
                                             navController.popBackStack()
                                         }
                                     },
-                                    modifier = Modifier.weight(1f)
+                                    modifier = Modifier.weight(1f),
+                                    colors = ButtonDefaults.elevatedButtonColors(
+                                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                        contentColor = MaterialTheme.colorScheme.onPrimary
+                                    ),
                                 ) {
                                     Text("Confirm")
                                 }

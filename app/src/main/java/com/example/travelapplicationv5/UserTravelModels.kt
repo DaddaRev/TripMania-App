@@ -131,7 +131,8 @@
             date = date,
             location = data["location"] as? String ?: "",
             free = data["free"] as? Boolean ?: true,
-            activities = (data["activities"] as? List<String>)?.joinToString(", ") ?: "",
+            activities = data["activities"] as? String ?: "",
+            //activities = (data["activities"] as? List<String>)?.joinToString(", ") ?: "",
             latitude = (data["latitude"] as? Double),
             longitude = (data["longitude"] as? Double)
         )

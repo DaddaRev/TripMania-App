@@ -12,6 +12,11 @@ import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -30,6 +35,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.selectableGroup
@@ -38,19 +44,24 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Abc
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Bookmark
 import androidx.compose.material.icons.filled.Cake
+import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.EditNote
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.ExitToApp
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.FlightTakeoff
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Image
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.MoveToInbox
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Palette
@@ -123,6 +134,8 @@ import kotlinx.coroutines.flow.stateIn
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.material3.Text
+import androidx.compose.ui.draw.alpha
+import com.example.travelapplicationv5.ui.theme.ButtonRed
 import kotlinx.coroutines.flow.onEach
 
 
@@ -636,12 +649,11 @@ fun DisplayUserScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 16.dp)
-                .background(Color.White)
         ) {
             val portrait = maxWidth < maxHeight
 
             LazyColumn(
+                modifier = Modifier.padding(horizontal = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 item {
@@ -695,6 +707,9 @@ fun DisplayUserScreen(
                     //Trips bar:
                     TravelTabBar(isSelf, viewModel)
                     TripsPart(navController, viewModel)
+                }
+                item {
+                    Spacer(modifier = Modifier.height(24.dp))
                 }
             }
 
@@ -813,7 +828,6 @@ fun EditProfileScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.White)
         ) {
             val portrait = maxWidth < maxHeight
 
@@ -861,7 +875,11 @@ fun EditProfileScreen(
                                 },
                                 modifier = Modifier
                                     .width(250.dp)
-                                    .height(50.dp)
+                                    .height(50.dp),
+                                colors = ButtonDefaults.elevatedButtonColors(
+                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                    contentColor = MaterialTheme.colorScheme.onPrimary
+                                ),
                             ) {
                                 Text("Complete sign up")
                             }
@@ -873,9 +891,9 @@ fun EditProfileScreen(
                                 },
                                 modifier = Modifier.weight(1f),
                                 colors = ButtonDefaults.elevatedButtonColors(
-                                    containerColor = Color.Red,
-                                    contentColor = Color.White
-                                )
+                                    containerColor = ButtonRed,
+                                    contentColor = MaterialTheme.colorScheme.onSecondary
+                                ),
                             ) {
                                 Text("Delete Account")
                             }
@@ -888,6 +906,10 @@ fun EditProfileScreen(
                                     }
                                 },
                                 modifier = Modifier.weight(1f),
+                                colors = ButtonDefaults.elevatedButtonColors(
+                                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                    contentColor = MaterialTheme.colorScheme.onPrimary
+                                ),
                             ) {
                                 Text("Confirm")
                             }
@@ -1084,6 +1106,79 @@ fun ProfileImage(context: Context, viewModel: UserProfileScreenViewModel, isEdit
     }
 }
 
+@Composable
+fun UserInfoActions(
+    navController: NavController,
+    viewModel: UserProfileScreenViewModel = viewModel(factory = Factory)
+) {
+    val isSelf by viewModel.isSelf.collectAsState()
+    val userProfile by viewModel.userProfile.collectAsState()
+    var expanded by remember { mutableStateOf(false) }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentSize(Alignment.TopEnd),
+        contentAlignment = Alignment.CenterEnd
+    ) {
+        IconButton(
+            onClick = { expanded = true },
+            modifier = Modifier
+                .padding(start = 8.dp)
+                .size(32.dp)
+        ) {
+            Icon(
+                imageVector = Icons.Default.MoreVert,
+                contentDescription = "More actions",
+            )
+        }
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            if (isSelf) {
+                DropdownMenuItem(
+                    text = { Text("Edit profile") },
+                    onClick = {
+                        expanded = false
+                        viewModel.resetErrors()
+                        navController.navigate("editProfile")
+                    },
+                    leadingIcon = { Icon(Icons.Default.Edit, contentDescription = null) }
+                )
+                DropdownMenuItem(
+                    text = { Text("Preferences") },
+                    onClick = {
+                        expanded = false
+                        navController.navigate("editPreferences")
+                    },
+                    leadingIcon = { Icon(Icons.Default.Favorite, contentDescription = null) }
+                )
+            }
+            DropdownMenuItem(
+                text = { Text("Reviews") },
+                onClick = {
+                    expanded = false
+                    navController.navigate("profileReviews/${userProfile.id}")
+                },
+                leadingIcon = { Icon(Icons.Default.Reviews, contentDescription = null) }
+            )
+            if (isSelf) {
+                DropdownMenuItem(
+                    text = { Text("Logout") },
+                    onClick = {
+                        expanded = false
+                        viewModel.userLogOut()
+                        navController.navigate("list")
+                    },
+                    leadingIcon = { Icon(Icons.Default.ExitToApp, contentDescription = null) }
+                )
+            }
+        }
+    }
+}
+
 
 @Composable
 fun UserInfoColumn(
@@ -1099,6 +1194,23 @@ fun UserInfoColumn(
         modifier = Modifier
             .fillMaxWidth(),
     ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(IntrinsicSize.Min),
+            horizontalArrangement = Arrangement.End
+        ) {
+            IconButton(
+                onClick = {
+                    //navController.navigate("profile/${userProfile.id}")
+                },
+                modifier = Modifier.size(32.dp).alpha(0f),
+            ) {
+                Icon(Icons.Default.Cancel, contentDescription = "Back")
+            }
+        }
+
+        /*
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -1121,7 +1233,7 @@ fun UserInfoColumn(
                     },
                     modifier = Modifier.size(32.dp),
                 ) {
-                    Icon(Icons.Default.FavoriteBorder, contentDescription = "Preferences")
+                    Icon(Icons.Default.Favorite, contentDescription = "Preferences")
                 }
             }
             IconButton(
@@ -1144,6 +1256,8 @@ fun UserInfoColumn(
                 }
             }
         }
+        */
+
         /*Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -1153,7 +1267,7 @@ fun UserInfoColumn(
             if (isSelf) {
                 Text(
                     text = "Logout",
-                    color = MaterialTheme.colorScheme.primary,
+                    color = MaterialTheme.colorScheme.primaryContainer,
                     fontWeight = FontWeight.Medium,
                     style = TextStyle(textDecoration = TextDecoration.Underline),
                     modifier = Modifier.padding(end = 7.dp).clickable {
@@ -1185,8 +1299,11 @@ fun UserInfoColumn(
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             RatingStars(computeAverageRating(collectUserReviews(userProfile.id, allTrips)))
+            Spacer(modifier = Modifier.weight(1f))
+            UserInfoActions(navController, viewModel)
         }
         Spacer(Modifier.height(10.dp))
     }
@@ -1198,6 +1315,8 @@ fun UserAdditionalInfoColumn(viewModel: UserProfileScreenViewModel) {
 
     val formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
     val date = userProfile.dateOfBirth.format(formatter)
+
+    var expanded by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -1211,61 +1330,83 @@ fun UserAdditionalInfoColumn(viewModel: UserProfileScreenViewModel) {
             )
             .padding(10.dp)
     ) {
-        Text(
-            "User Info",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-
-        //Phone number:
         Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { expanded = !expanded },
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = Icons.Default.Phone,
-                contentDescription = "Phone number",
-                modifier = Modifier.size(24.dp)
-            )
-            Spacer(Modifier.width(4.dp))
             Text(
-                userProfile.phoneNumber,
-                style = MaterialTheme.typography.bodyMedium
+                "User Info",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.weight(1f)
+            )
+
+            Icon(
+                imageVector = if (expanded) Icons.Default.Close else Icons.Default.Add,
+                contentDescription = if (expanded) "Collapse" else "Expand"
             )
         }
 
-        //Email:
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(bottom = 8.dp)
+        AnimatedVisibility(
+            visible = expanded,
+            enter = expandVertically() + fadeIn(),
+            exit = shrinkVertically() + fadeOut()
         ) {
-            Icon(
-                imageVector = Icons.Default.Email,
-                contentDescription = "Email",
-                modifier = Modifier.size(24.dp)
-            )
-            Spacer(Modifier.width(4.dp))
-            Text(
-                userProfile.email,
-                style = MaterialTheme.typography.bodyMedium
-            )
-        }
+            Column {
+                Spacer(Modifier.height(8.dp))
 
-        //Birthday:
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(bottom = 8.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Cake,
-                contentDescription = "Birthday",
-                modifier = Modifier.size(24.dp)
-            )
-            Spacer(Modifier.width(4.dp))
-            Text(
-                date,
-                style = MaterialTheme.typography.bodyMedium
-            )
+                //Phone number:
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Phone,
+                        contentDescription = "Phone number",
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(Modifier.width(4.dp))
+                    Text(
+                        userProfile.phoneNumber,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+
+                //Email:
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Email,
+                        contentDescription = "Email",
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(Modifier.width(4.dp))
+                    Text(
+                        userProfile.email,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+
+                //Birthday:
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Cake,
+                        contentDescription = "Birthday",
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(Modifier.width(4.dp))
+                    Text(
+                        date,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            }
         }
     }
 }
@@ -1361,6 +1502,8 @@ fun TravelPreferencesSection(
     preferences: Map<String, List<String>>,
     viewModel: UserProfileScreenViewModel
 ) {
+    var expanded by remember { mutableStateOf(false) }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -1373,33 +1516,54 @@ fun TravelPreferencesSection(
             )
             .padding(10.dp)
     ) {
-        Text(
-            "Travel Preferences",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { expanded = !expanded },
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                "Travel Preferences",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.weight(1f)
+            )
 
-        preferences.forEach { (section, values) ->
+            Icon(
+                imageVector = if (expanded) Icons.Default.Close else Icons.Default.Add,
+                contentDescription = if (expanded) "Collapse" else "Expand"
+            )
+        }
 
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(bottom = 8.dp)
-            ) {
-                val valuesSize = values.size
-                var valuesCounter = 0
+        AnimatedVisibility(
+            visible = expanded,
+            enter = expandVertically() + fadeIn(),
+            exit = shrinkVertically() + fadeOut()
+        ) {
+            Column {
+                Spacer(Modifier.height(8.dp))
 
-                Icon(
-                    imageVector = viewModel.icons[section] ?: Icons.Default.Settings,
-                    contentDescription = section,
-                    modifier = Modifier.size(24.dp)
-                )
-                Spacer(Modifier.width(4.dp))
-                values.forEach { value ->
-                    Text(
-                        "$value${if (valuesCounter == valuesSize - 1) "" else "; "}",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    valuesCounter++
+                preferences.forEach { (section, values) ->
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    ) {
+                        val valuesSize = values.size
+                        var valuesCounter = 0
+
+                        Icon(
+                            imageVector = viewModel.icons[section] ?: Icons.Default.Settings,
+                            contentDescription = section,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Spacer(Modifier.width(4.dp))
+                        values.forEach { value ->
+                            Text(
+                                "$value${if (valuesCounter == valuesSize - 1) "" else "; "}",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            valuesCounter++
+                        }
+                    }
                 }
             }
         }
@@ -1472,6 +1636,10 @@ fun EditableTravelPreferences(navController: NavController, viewModel: UserProfi
                                 navController.navigate("list")
                         },
                         modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.elevatedButtonColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        ),
                     ) {
                         Text("Confirm sign up")
                     }
@@ -1484,6 +1652,10 @@ fun EditableTravelPreferences(navController: NavController, viewModel: UserProfi
                                 navController.navigate("profile/${userProfile.id}")
                         },
                         modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.elevatedButtonColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        ),
                     ) {
                         Text("Save")
                     }
@@ -1576,7 +1748,8 @@ fun TravelTabBar(isSelf: Boolean, viewModel: UserProfileScreenViewModel) {
                         .size(36.dp)
                         .clip(CircleShape)
                         .background(
-                            if (sectionSelected.value == section.key) Color(0xFFD8D4EC) else Color.Transparent
+                            if (sectionSelected.value == section.key) MaterialTheme.colorScheme.surfaceContainer
+                            else Color.Transparent
                         ),
                     contentAlignment = Alignment.Center
                 ) {
@@ -1614,10 +1787,13 @@ fun TripSectionUser(
     Card(
         modifier = modifier
             .padding(horizontal = 2.dp)
-            .clickable { navController.navigate("detail/${trip.id}")
-    },
+            .clickable { navController.navigate("detail/${trip.id}") },
         shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(4.dp)
+        elevation = CardDefaults.cardElevation(6.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            contentColor = MaterialTheme.colorScheme.onSurface
+        )
     ) {
         val fontTitle = MaterialTheme.typography.titleMedium
         val fontBody = if (portrait) {
@@ -1629,7 +1805,7 @@ fun TripSectionUser(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(195.dp)
+                .height(200.dp)
                 .padding(6.dp)
         ) {
             Column(
@@ -1651,11 +1827,15 @@ fun TripSectionUser(
                 Box(
                     modifier = Modifier
                         .wrapContentWidth()
-                        .padding(horizontal = 6.dp, vertical = 4.dp)
+                        .padding(horizontal = 0.dp, vertical = 4.dp)
                         .border(2.dp, Color.Black, RoundedCornerShape(8.dp))
                         .padding(6.dp)
                 ) {
-                    Text(text = "€ ${trip.price.first} - ${trip.price.second}")
+                    val firstPrice = if (trip.price.first.toString().length >= 5)
+                        "${trip.price.first.toString().dropLast(3)}K" else "${trip.price.first}"
+                    val secondPrice = if (trip.price.second.toString().length >= 5)
+                        "${trip.price.second.toString().dropLast(3)}K" else "${trip.price.second}"
+                    Text(text = "€ $firstPrice - $secondPrice", style = fontBody)
                 }
             }
 
@@ -1665,6 +1845,7 @@ fun TripSectionUser(
                     .fillMaxHeight()
                     .weight(1f)
             ) {
+                Spacer(Modifier.height(4.dp))
                 Text(
                     text = trip.title,
                     style = fontTitle,
@@ -1678,7 +1859,7 @@ fun TripSectionUser(
                         .fillMaxHeight()
                         .weight(if (portrait) 3f else 4f)
                 ) {
-                    Spacer(Modifier.height(4.dp))
+                    //Spacer(Modifier.height(4.dp))
 
                     Spacer(Modifier.height(8.dp))
 
@@ -1706,7 +1887,7 @@ fun TripSectionUser(
                         Spacer(Modifier.width(4.dp))
                         Text("Spots left: $spotsLeft", style = fontBody)
                     }
-                    Spacer(Modifier.height(10.dp))
+                    Spacer(Modifier.height(4.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         if (owned) {
                             if(isSelf){  //if the user is the logged one (HARDCODED Anna_Smith)
@@ -1717,11 +1898,12 @@ fun TripSectionUser(
                                 )
                                 Spacer(Modifier.width(4.dp))
                                 if (trip.requests.isNotEmpty()) {
-                                    Text("see new applications", style = fontBody, color = Color.Red)
+                                    Text("See new applications", style = fontBody, color = Color.Red)
                                 } else {
-                                    Text("No application to see", style = fontBody, color = Color.Black)
+                                    Text("No new applications", style = fontBody)
                                 }
 
+                                /*
                                 Spacer(Modifier.width(40.dp))
 
                                 IconButton(
@@ -1735,6 +1917,7 @@ fun TripSectionUser(
                                         modifier = Modifier.size(36.dp)
                                     )
                                 }
+                                */
                             }
                         } else if (past) {
                             if(isSelf){
@@ -1778,7 +1961,11 @@ fun DeleteDialog(
                     onClick = {
                         vm.deleteUser()
                         navController.navigate("list")
-                    }) {
+                    },
+                    colors = ButtonDefaults.elevatedButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),) {
                     Text("Confirm")
                 }
             },

@@ -43,6 +43,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SearchBar
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -417,6 +418,10 @@ fun SearchBarCustom(viewModel: TravelProposalListScreenViewModel) {
             .background(Color.Transparent),
         expanded = expanded,
         onExpandedChange = { viewModel.onExpandedChange(it) },
+        colors = SearchBarDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.background,
+            dividerColor = Color.Transparent
+        ),
         shape = RoundedCornerShape(16.dp),
         windowInsets = WindowInsets(top = 0.dp),
         inputField = {
@@ -457,9 +462,13 @@ fun SearchBarCustom(viewModel: TravelProposalListScreenViewModel) {
                     }
                 },
                 colors = TextFieldDefaults.colors(
+                    focusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                    disabledContainerColor = MaterialTheme.colorScheme.surfaceContainer,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent,
-                    disabledIndicatorColor = Color.Transparent,
+                    cursorColor = MaterialTheme.colorScheme.onSurface,
+                    focusedTextColor = MaterialTheme.colorScheme.onSurface
                 ),
             )
         }
@@ -552,11 +561,13 @@ fun SearchBarCustom(viewModel: TravelProposalListScreenViewModel) {
                     },
                     border = AssistChipDefaults.assistChipBorder(
                         enabled = true,
-                        borderColor = Color.LightGray
+                        borderColor = MaterialTheme.colorScheme.surfaceContainer
                     ),
                     shape = RoundedCornerShape(8.dp),
                     colors = AssistChipDefaults.assistChipColors(
-                        containerColor = if (isSelected) Color.LightGray else Color.Transparent
+                        containerColor =
+                            if (isSelected) MaterialTheme.colorScheme.surfaceContainer
+                            else Color.Transparent
                     )
                 )
             }
@@ -623,11 +634,13 @@ fun FilterChipRow(
                 },
                 border = AssistChipDefaults.assistChipBorder(
                     enabled = true,
-                    borderColor = Color.LightGray
+                    borderColor = MaterialTheme.colorScheme.surfaceContainer
                 ),
                 shape = RoundedCornerShape(8.dp),
                 colors = AssistChipDefaults.assistChipColors(
-                    containerColor = if (isSelected) Color.LightGray else Color.Transparent
+                    containerColor =
+                        if (isSelected) MaterialTheme.colorScheme.surfaceContainer
+                        else Color.Transparent
                 )
             )
         }

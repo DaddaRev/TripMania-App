@@ -78,6 +78,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.travelapplicationv5.ui.theme.TravelApplicationV5Theme
 import kotlinx.coroutines.launch
 
 
@@ -100,7 +101,9 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            TravelApp(viewModelTrips, viewModelNewTrip, viewModelTripsList, viewModelOwnList, viewModelUserProfile, viewModelNotification, viewModelReview)
+            TravelApplicationV5Theme {
+                TravelApp(viewModelTrips, viewModelNewTrip, viewModelTripsList, viewModelOwnList, viewModelUserProfile, viewModelNotification, viewModelReview)
+            }
         }
     }
 
@@ -185,7 +188,7 @@ fun TravelApp(vmTrips: TravelProposalScreenViewModel, vmNewTrip: HandleTravelPro
                         Icon(
                             imageVector = Icons.Default.Close,
                             contentDescription = "Close",
-                            tint = Color.White
+                            tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 }

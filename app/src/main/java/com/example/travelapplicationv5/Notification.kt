@@ -195,7 +195,7 @@ fun NotificationsScreen(
                         horizontalArrangement = Arrangement.Center
                     ) {
                         Text(
-                            text = "No more reviews to show",
+                            text = "No more notifications to show",
                             style = MaterialTheme.typography.bodyMedium,
                         )
                     }
