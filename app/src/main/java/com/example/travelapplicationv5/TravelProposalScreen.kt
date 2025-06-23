@@ -669,9 +669,30 @@ fun SwitchSection(vm: TravelProposalScreenViewModel = viewModel(factory = Factor
     }
 }
 
+@Composable
+fun MapButton(trip: Trip, isLandscape: Boolean) {
+    val context = LocalContext.current
+
+    Button(
+        onClick = {
+            UtilityMaps.openTripItinerary(context, trip.itinerary)
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 10.dp),
+        colors = ButtonDefaults.elevatedButtonColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            contentColor = MaterialTheme.colorScheme.onPrimary
+        ),
+    ) {
+        Icon(Icons.Default.Map, contentDescription = "Map", modifier = Modifier.size(18.dp))
+        Spacer(modifier = Modifier.width(8.dp))
+        Text("Map")
+    }
+}
 
 @Composable
-fun TelegramInviteButton(trip: Trip) {
+fun TelegramInviteButton(trip: Trip, isLandscape: Boolean) {
     val context = LocalContext.current
 
     // Get the Telegram link from the trip
@@ -710,15 +731,16 @@ fun TelegramInviteButton(trip: Trip) {
                 }
             },
             modifier = Modifier
-                .padding(top = 16.dp)
                 .fillMaxWidth()
+                .padding(horizontal = 10.dp),
+            colors = ButtonDefaults.elevatedButtonColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ),
         ) {
-            Icon(
-                imageVector = Icons.AutoMirrored.Filled.Chat,
-                contentDescription = "Telegram",
-                modifier = Modifier.padding(end = 8.dp)
-            )
-            Text("Join Telegram")
+            Icon(Icons.AutoMirrored.Filled.Chat, contentDescription = "Telegram", modifier = Modifier.size(18.dp))
+            Spacer(modifier = Modifier.width(8.dp))
+            Text("Chat")
         }
     }
 }
@@ -942,29 +964,15 @@ fun TripSection(navController: NavController, vm: TravelProposalScreenViewModel 
                         )
                     }
                 }
+
                 item{
-                        if(vm.isCurrentUserAccepted() || (isLogged && owned)){
-                            TelegramInviteButton(trip = trip)
-                        }
+                    if(vm.isCurrentUserAccepted() || (isLogged && owned)){
+                        Spacer(modifier = Modifier.height(6.dp))
+                        TelegramInviteButton(trip = trip, isLandscape)
+                    }
                 }
                 item {
-                    Spacer(modifier = Modifier.height(12.dp))
-                    Button(
-                        onClick = {
-                            UtilityMaps.openTripItinerary(context, trip.itinerary)
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 12.dp),
-                        colors = ButtonDefaults.elevatedButtonColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer,
-                            contentColor = MaterialTheme.colorScheme.onPrimary
-                        ),
-                    ) {
-                        Icon(Icons.Default.Map, contentDescription = "Map", modifier = Modifier.size(18.dp))
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Map")
-                    }
+                    MapButton(trip = trip, isLandscape)
                 }
             }
         }
@@ -1027,7 +1035,8 @@ fun TripSection(navController: NavController, vm: TravelProposalScreenViewModel 
                     },
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
-                        .padding(bottom = if (isLandscape) 45.dp else 75.dp),
+                        .padding(bottom = 56.dp, end = 16.dp)
+                        .size(56.dp),
                 ) {
                     Text(text = "Join")
                 }
@@ -1044,7 +1053,8 @@ fun TripSection(navController: NavController, vm: TravelProposalScreenViewModel 
                     },
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
-                        .padding(bottom = if (isLandscape) 45.dp else 75.dp),
+                        .padding(bottom = 56.dp, end = 16.dp)
+                        .size(56.dp),
                 ) {
                     Text(text = "Leave")
                 }
@@ -1055,7 +1065,8 @@ fun TripSection(navController: NavController, vm: TravelProposalScreenViewModel 
                     },
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
-                        .padding(bottom = if (isLandscape) 45.dp else 75.dp),
+                        .padding(bottom = 56.dp, end = 16.dp)
+                        .size(56.dp),
                 ) {
                     Text(text = "Join")
                 }
@@ -1376,7 +1387,7 @@ fun MembersSection(navController: NavController, vm: TravelProposalScreenViewMod
                     .align(Alignment.BottomEnd)
                     .padding(bottom = if (isLandscape) 20.dp else 30.dp)
                     .size(50.dp),
-                containerColor = Color.Red,
+                containerColor = ButtonRed,
                 contentColor = Color.White,
             ) {
                 Row(
@@ -1397,9 +1408,9 @@ fun MembersSection(navController: NavController, vm: TravelProposalScreenViewMod
                 },
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(bottom = if (isLandscape) 45.dp else 75.dp),
+                    .padding(bottom = 56.dp, end = 16.dp),
             ) {
-                Row() {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Spacer(modifier = Modifier.width(8.dp))
                     Icon(
                         imageVector = Icons.Default.Add,
@@ -1543,7 +1554,7 @@ fun ReviewsSection(navController: NavController, vm: TravelProposalScreenViewMod
                     .align(Alignment.BottomEnd)
                     .padding(bottom = if (isLandscape) 20.dp else 30.dp)
                     .size(50.dp),
-                containerColor = Color.Red,
+                containerColor = ButtonRed,
                 contentColor = Color.White,
             ) {
                 Row(
@@ -1570,9 +1581,9 @@ fun ReviewsSection(navController: NavController, vm: TravelProposalScreenViewMod
                 },
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(bottom = if (isLandscape) 45.dp else 75.dp),
+                    .padding(bottom = 56.dp, end = 16.dp),
             ) {
-                Row() {
+                Row(verticalAlignment = Alignment.CenterVertically) {
                     Spacer(modifier = Modifier.width(8.dp))
                     Icon(
                         imageVector = Icons.Default.Add,
