@@ -845,7 +845,7 @@ private fun StepTwo(viewModel: HandleTravelProposalScreenViewModel) {
             Spacer(Modifier.height(20.dp))
             TelegramLinkField(viewModel)
             if (keyboardOpen) {
-                Spacer(Modifier.height(250.dp))
+                Spacer(Modifier.height(175.dp))
             }
         }
     }
@@ -1140,7 +1140,8 @@ private fun TelegramLinkField(viewModel: HandleTravelProposalScreenViewModel) {
     OutlinedTextField(
         value = viewModel.telegramLink,
         onValueChange = { viewModel.telegramLink = it },
-        label = { Text("https://t.me/yourgroup") },
+        placeholder = { Text("https://t.me/yourgroup") },
+        label = { Text("Telegram Group Link") },
         isError = validationErrors.telegramLink.isNotBlank(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
         modifier = Modifier.fillMaxWidth()
@@ -2011,8 +2012,23 @@ fun TopBar(navController: NavController, show: Boolean = true, initializeHandle:
             }
             IconButton(onClick = {
                 if (isLogged){
-                    navController.navigate("profile/${userId}") {
-                        launchSingleTop = true
+                    var selectedId: String?
+                    try {
+                        val input = navController.currentBackStackEntry?.arguments?.toString()
+                         selectedId =
+                            if (input != null)
+                                Regex("userId=(\\d+)").find(input)?.groupValues?.get(1)
+                            else userId.toString()
+                    } catch (ex: Exception) {
+                        selectedId = userId.toString()
+                    }
+
+                    if (selectedId == null || selectedId.toInt() == userId) {
+                        navController.navigate("profile/${userId}") {
+                            launchSingleTop = true
+                        }
+                    } else {
+                        navController.navigate("profile/${userId}")
                     }
                 }else{
                     navController.navigate("login") {

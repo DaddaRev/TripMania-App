@@ -1,6 +1,8 @@
 package com.example.travelapplicationv5
 
 import android.util.Log
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -321,6 +323,7 @@ fun TravelListScreen(
     }
 
     val isLoggedIn = vmUserProfile.isUserLoggedIn.collectAsState().value
+    val activity = LocalActivity.current
 
     val filteredTrips = viewModel.filteredTrips.collectAsState().value
     println("TRIPS : " + filteredTrips)
@@ -328,6 +331,10 @@ fun TravelListScreen(
     val configuration = LocalConfiguration.current
     val portrait = configuration.orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT
     val itemsPerRow = if (portrait) 2 else 3
+
+    BackHandler {
+        activity?.finish()
+    }
 
     Scaffold(
         topBar = { TopBar(navController, false) },
