@@ -59,7 +59,6 @@ fun DisplayUserReviewScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 16.dp)
-                .background(Color.White)
         ) {
             val portrait = maxWidth < maxHeight
 

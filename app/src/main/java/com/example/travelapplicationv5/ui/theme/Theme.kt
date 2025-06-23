@@ -11,12 +11,38 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
-private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+private val LightColorScheme = lightColorScheme(
+    primary = PrimaryGreen,
+    onPrimary = OnPrimary,
+    secondary = SunsetOrange,
+    onSecondary = OnSecondary,
+    background = LightGray,
+    onBackground = OnBackground,
+    surface = LightGray,
+    onSurface = OnSurface,
+    tertiary = Ocean,
+
+    primaryContainer = PrimaryGreen,
+    onPrimaryContainer = OnPrimary,
+    secondaryContainer = LightGreen,
+    onSecondaryContainer = OnSecondary,
+    surfaceVariant = VeryLightCyan, // card
+    surfaceContainer = LightCyan // chips
 )
 
+private val DarkColorScheme = darkColorScheme(
+    primary = SkyBlueDark,
+    onPrimary = OnPrimary,
+    secondary = SunsetOrangeDark,
+    onSecondary = OnSecondary,
+    background = BackgroundDark,
+    onBackground = OnPrimary,
+    surface = SurfaceDark,
+    onSurface = OnPrimary,
+    tertiary = Ocean
+)
+
+/*
 private val LightColorScheme = lightColorScheme(
     primary = Purple40,
     secondary = PurpleGrey40,
@@ -33,11 +59,18 @@ private val LightColorScheme = lightColorScheme(
     */
 )
 
+private val DarkColorScheme = darkColorScheme(
+    primary = Purple80,
+    secondary = PurpleGrey80,
+    tertiary = Pink80
+)
+*/
+
 @Composable
 fun TravelApplicationV5Theme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    darkTheme: Boolean = false,//isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {

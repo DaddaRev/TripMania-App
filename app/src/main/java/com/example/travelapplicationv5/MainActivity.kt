@@ -82,6 +82,7 @@ import androidx.navigation.navArgument
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
+import com.example.travelapplicationv5.ui.theme.TravelApplicationV5Theme
 import kotlinx.coroutines.launch
 
 
@@ -125,7 +126,9 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            TravelApp(viewModelTrips, viewModelNewTrip, viewModelTripsList, viewModelOwnList, viewModelUserProfile, viewModelNotification, viewModelReview)
+            TravelApplicationV5Theme {
+                TravelApp(viewModelTrips, viewModelNewTrip, viewModelTripsList, viewModelOwnList, viewModelUserProfile, viewModelNotification, viewModelReview)
+            }
         }
     }
 
@@ -210,7 +213,7 @@ fun TravelApp(vmTrips: TravelProposalScreenViewModel, vmNewTrip: HandleTravelPro
                         Icon(
                             imageVector = Icons.Default.Close,
                             contentDescription = "Close",
-                            tint = Color.White
+                            tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
                 }

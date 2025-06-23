@@ -3,6 +3,7 @@ package com.example.travelapplicationv5
 import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
@@ -99,10 +100,18 @@ fun LogInScreen(
             Spacer(modifier = Modifier.height(150.dp))
             Button(
                 onClick = {
-                    viewModel.setLoginPhase()
-                    val intent = Intent(context, SignInUpActivity::class.java)
-                    launcher.launch(intent)
+                    if (viewModel.isUserLoggedIn.value) {
+                        Toast.makeText(context, "You are already logged in", Toast.LENGTH_SHORT).show()
+                    } else {
+                        viewModel.setLoginPhase()
+                        val intent = Intent(context, SignInUpActivity::class.java)
+                        launcher.launch(intent)
+                    }
                 },
+                colors = ButtonDefaults.elevatedButtonColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ),
                 modifier = Modifier
                     .height(50.dp),
             ) {
@@ -114,12 +123,16 @@ fun LogInScreen(
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = "Sign up here with Google",
-                    color = MaterialTheme.colorScheme.primary,
+                    color = MaterialTheme.colorScheme.primaryContainer,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier.clickable {
-                        viewModel.setRegistrationPhase()
-                        val intent = Intent(context, SignInUpActivity::class.java)
-                        launcher.launch(intent)
+                        if (viewModel.isUserLoggedIn.value) {
+                            Toast.makeText(context, "You are already logged in", Toast.LENGTH_SHORT).show()
+                        } else {
+                            viewModel.setRegistrationPhase()
+                            val intent = Intent(context, SignInUpActivity::class.java)
+                            launcher.launch(intent)
+                        }
                     }
                 )
             }

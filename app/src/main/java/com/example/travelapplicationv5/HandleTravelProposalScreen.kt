@@ -6,7 +6,6 @@ import android.app.DatePickerDialog
 import android.content.Context
 import android.content.res.Configuration
 import android.net.Uri
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -36,6 +35,9 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.AssistChip
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
@@ -75,6 +77,7 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -83,24 +86,27 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import coil3.compose.AsyncImage
+import com.example.travelapplicationv5.ui.theme.ButtonRed
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 import kotlin.collections.plus
 import kotlin.math.roundToInt
 
@@ -207,6 +213,10 @@ class HandleTravelProposalScreenViewModel(val model: TripModel, val userModel :U
         _step.value = step.value - 1
     }
 
+    fun setStep(step: Int) {
+        _step.value = step
+    }
+
     fun resetStep() {
         _step.value = 0
     }
@@ -264,16 +274,24 @@ class HandleTravelProposalScreenViewModel(val model: TripModel, val userModel :U
     var telegramLink by mutableStateOf("")
 
     //stops functions
-    fun addStop() {
+    fun addStop(): Boolean {
+        val start = _startDate ?: startDate
+        val end = _endDate ?: endDate
+        if (start == null || end == null) return false
+
+        val lastStopDate = stops.lastOrNull()?.date ?: _startDate ?: startDate ?: LocalDate.now()
+
         stops.add(
             Stop(
-                title = "Stop ${stops.size + 1}",
-                date = _startDate ?: startDate ?: LocalDate.now(),
-                location = countries,
+                title = "",
+                date = lastStopDate,
+                location = "",
                 free = true,
                 activities = ""
             )
         )
+
+        return true
     }
 
     fun removeStop(index: Int) {
@@ -312,6 +330,9 @@ class HandleTravelProposalScreenViewModel(val model: TripModel, val userModel :U
 
     fun updateEndDate(date: LocalDate) {
         _endDate = date
+        if (_startDate == null || date.isBefore(_startDate)) {
+            _startDate = date
+        }
     }
 
     fun addImage(uri: String) {
@@ -448,10 +469,12 @@ class HandleTravelProposalScreenViewModel(val model: TripModel, val userModel :U
                     url.removePrefix(pathPrefix).takeIf { it.isNotEmpty() }
                 }
 
+                /*
                 SupabaseHandler.deleteImages(
                     imagePaths = toDeletePaths,
                     bucketName = SupabaseHandler.bucketTrips
                 )
+                */
             }
 
             // returns the author users, if exists
@@ -495,6 +518,14 @@ class HandleTravelProposalScreenViewModel(val model: TripModel, val userModel :U
 
         // Check if all validations pass
         if (isValid) {
+            val indexedStops = stops.withIndex().toList()
+            val sortedStops = indexedStops.sortedWith(
+                compareBy<IndexedValue<Stop>> { it.value.date }.thenBy { it.index }
+            ).map { it.value }
+
+            stops.clear()
+            stops.addAll(sortedStops)
+
             saveTrip(context)
             return true
 
@@ -627,9 +658,9 @@ fun NewTravelScreen(
                                         },
                                         modifier = Modifier.weight(1f),
                                         colors = ButtonDefaults.elevatedButtonColors(
-                                            containerColor = Color.Red,
-                                            contentColor = Color.White
-                                        )
+                                            containerColor = ButtonRed,
+                                            contentColor = MaterialTheme.colorScheme.onSecondary
+                                        ),
                                     ) {
                                         Text("Cancel")
                                     }
@@ -643,6 +674,10 @@ fun NewTravelScreen(
                                             }
                                         },
                                         modifier = Modifier.weight(1f),
+                                        colors = ButtonDefaults.elevatedButtonColors(
+                                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                            contentColor = MaterialTheme.colorScheme.onPrimary
+                                        ),
                                     ) {
                                         Text("Confirm")
                                     }
@@ -724,7 +759,13 @@ private fun Wizard(
         ) {
             Row(horizontalArrangement = Arrangement.Start) {
                 if (step > 0) {
-                    Button(onClick = { viewModel.decrementStep() }) {
+                    Button(
+                        onClick = { viewModel.decrementStep() },
+                        colors = ButtonDefaults.elevatedButtonColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        ),
+                    ) {
                         Text("Back")
                     }
                 }
@@ -735,9 +776,9 @@ private fun Wizard(
                         viewModel.initialized = false
                     },
                     colors = ButtonDefaults.elevatedButtonColors(
-                        containerColor = Color.Red,
-                        contentColor = Color.White
-                    )
+                        containerColor = ButtonRed,
+                        contentColor = MaterialTheme.colorScheme.onSecondary
+                    ),
                 ) {
                     Text("Cancel")
                 }
@@ -745,22 +786,39 @@ private fun Wizard(
             }
 
             if (step < 4) {
-                Button(onClick = { viewModel.incrementStep() }) {
+                Button(
+                    onClick = { viewModel.incrementStep() },
+                    colors = ButtonDefaults.elevatedButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
+                ) {
                     Text("Next")
                 }
             } else {
-                Button(onClick = {
-                    if (viewModel.confirm(context) == true) {
-                        navController.popBackStack()
-                        viewModel.initialized = false
-                    }
-                }) {
+                Button(
+                    onClick = {
+                        if (viewModel.confirm(context) == true) {
+                            navController.popBackStack()
+                            viewModel.initialized = false
+                        }
+                    },
+                    colors = ButtonDefaults.elevatedButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
+                ) {
                     Text("Confirm")
                 }
             }
         }
         Spacer(modifier = Modifier.height(if (!isLandscape) 60.dp else 5.dp))
     }
+}
+
+@Composable
+fun isKeyboardOpen(): Boolean {
+    return WindowInsets.ime.getBottom(LocalDensity.current) > 0
 }
 
 @Composable
@@ -775,6 +833,8 @@ private fun StepOne(viewModel: HandleTravelProposalScreenViewModel) {
 
 @Composable
 private fun StepTwo(viewModel: HandleTravelProposalScreenViewModel) {
+    val keyboardOpen = isKeyboardOpen()
+
     LazyColumn(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -784,12 +844,17 @@ private fun StepTwo(viewModel: HandleTravelProposalScreenViewModel) {
             Description(viewModel)
             Spacer(Modifier.height(20.dp))
             TelegramLinkField(viewModel)
+            if (keyboardOpen) {
+                Spacer(Modifier.height(250.dp))
+            }
         }
     }
 }
 
 @Composable
 private fun StepThree(viewModel: HandleTravelProposalScreenViewModel) {
+    val keyboardOpen = isKeyboardOpen()
+
     LazyColumn(
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -797,6 +862,9 @@ private fun StepThree(viewModel: HandleTravelProposalScreenViewModel) {
             Countries(viewModel)
             Spacer(Modifier.height(20.dp))
             SpotsAdd(onSpotsChange = { viewModel.spots = it }, viewModel)
+            if (keyboardOpen) {
+                Spacer(Modifier.height(250.dp))
+            }
         }
     }
 }
@@ -814,7 +882,19 @@ private fun StepFour(viewModel: HandleTravelProposalScreenViewModel) {
 
 @Composable
 private fun StepFive(viewModel: HandleTravelProposalScreenViewModel) {
-    LazyColumn {
+    val listState = rememberLazyListState()
+    val stopsCount = viewModel.stops.size
+
+    LaunchedEffect(stopsCount) {
+        if (stopsCount > 0) {
+            listState.animateScrollToItem(stopsCount - 1)
+        }
+    }
+
+    LazyColumn(
+        state = listState,
+        modifier = Modifier.fillMaxWidth()
+    ) {
         item {
             StopsSection(viewModel)
         }
@@ -902,7 +982,7 @@ private fun ImageUpload(viewModel: HandleTravelProposalScreenViewModel) {
                     Icon(
                         imageVector = Icons.Default.Add,
                         contentDescription = "Add Image",
-                        tint = MaterialTheme.colorScheme.primary,
+                        tint = MaterialTheme.colorScheme.primaryContainer,
                         modifier = Modifier.size(36.dp)
                     )
                 }
@@ -1090,11 +1170,16 @@ private fun StepIndicator(viewModel: HandleTravelProposalScreenViewModel) {
             Box(
                 modifier = Modifier
                     .size(if (!isLandscape) 32.dp else 15.dp)
+                    .clickable(enabled = i != step) {
+                        viewModel.setStep(i)
+                    }
                     .background(
-                        color = if (i == step) MaterialTheme.colorScheme.primary else if (errorStep.contains(
-                                i
-                            )
-                        ) Color.Red else Color.LightGray,
+                        color =
+                            if (i == step) MaterialTheme.colorScheme.primaryContainer
+                            else if (errorStep.contains(i))
+                                ButtonRed
+                            else
+                                Color.LightGray,
                         shape = CircleShape
                     ),
                 contentAlignment = Alignment.Center
@@ -1188,7 +1273,11 @@ private fun DateSelectionSection(viewModel: HandleTravelProposalScreenViewModel)
         Column {
             Button(
                 onClick = { showStart = true },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.elevatedButtonColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ),
             ) {
                 Text(
                     viewModel.startDate?.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
@@ -1200,7 +1289,11 @@ private fun DateSelectionSection(viewModel: HandleTravelProposalScreenViewModel)
 
             Button(
                 onClick = { showEnd = true },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.elevatedButtonColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ),
             ) {
                 Text(
                     viewModel.endDate?.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
@@ -1247,9 +1340,14 @@ private fun DateSelectionSection(viewModel: HandleTravelProposalScreenViewModel)
 
 @Composable
 fun StopsSection(vm: HandleTravelProposalScreenViewModel) {
+    fun isStopEmpty(stop: Stop): Boolean {
+        return stop.title.isBlank() && stop.location.isBlank() && stop.activities.isBlank()
+    }
+
     var showEdit by remember { mutableStateOf(false) }
     var selectedStopIndex by remember { mutableIntStateOf(-1) }
     val validationErrors by vm.valErrors.collectAsState()
+    val context = LocalContext.current
 
     Column {
         Text("Stops", style = MaterialTheme.typography.titleMedium)
@@ -1267,14 +1365,36 @@ fun StopsSection(vm: HandleTravelProposalScreenViewModel) {
             }
         }
 
-        Button(onClick = { vm.addStop() }) {
+        Button(onClick = {
+            if (vm.addStop()) {
+                selectedStopIndex = vm.stops.lastIndex
+                showEdit = true
+            } else {
+                Toast.makeText(
+                    context,
+                    "Please set start and end date before adding a stop",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        },
+            colors = ButtonDefaults.elevatedButtonColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            ),
+        ) {
             Text("Add Stop")
         }
     }
     if (showEdit && selectedStopIndex >= 0) {
         EditStop(
             stop = vm.stops[selectedStopIndex],
-            onDismiss = { showEdit = false },
+            onDismiss = {
+                val stop = vm.stops.getOrNull(selectedStopIndex)
+                if (stop != null && isStopEmpty(stop)) {
+                    vm.removeStop(selectedStopIndex)
+                }
+                showEdit = false
+            },
             onSave = { updatedStop ->
                 vm.updateStop(selectedStopIndex, updatedStop)
                 showEdit = false
@@ -1297,7 +1417,11 @@ fun StopItem(stop: Stop, onEditClick: () -> Unit, onDeleteClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(8.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.LightGray,
+            contentColor = MaterialTheme.colorScheme.onSurface
+        )
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(stop.title, style = MaterialTheme.typography.bodyMedium)
@@ -1346,23 +1470,30 @@ fun EditStop(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Edit Stop") },
+        containerColor = MaterialTheme.colorScheme.background,
         text = {
             Column {
                 OutlinedTextField(
                     value = title,
                     onValueChange = { title = it },
-                    label = { Text("Title") }
+                    label = { Text("Title") },
+                    placeholder = { Text("Stop title") }
                 )
 
                 OutlinedTextField(
                     value = location,
                     onValueChange = { location = it },
-                    label = { Text("Location") }
+                    label = { Text("Location") },
+                    placeholder = { Text("e.g. Uffizi, Florence, Italy") }
                 )
                 Spacer(Modifier.height(6.dp))
                 Button(
                     onClick = { pickDate = true },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.elevatedButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
                 ) {
                     Text(
                         date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
@@ -1382,28 +1513,46 @@ fun EditStop(
                     value = activities,
                     onValueChange = { activities = it },
                     label = { Text("Activities") },
-                    placeholder = { Text(" suggested activities (e.g., climbing, skiing, scuba diving, attraction seeking, exploring the city….)") },
-                    modifier = Modifier.height(100.dp)
+                    placeholder = { Text("Suggested activities (e.g., climbing, skiing attraction seeking, exploring the city….)") },
+                    minLines = 3,
+                    maxLines = 5,
                 )
             }
         },
         confirmButton = {
+            val isInputValid = title.trim().isNotEmpty() && location.trim().isNotEmpty()
+
             Button(onClick = {
+                val coords = UtilityMaps.getLatLngFromLocationName(context, location, Locale.ENGLISH)
+                    ?: UtilityMaps.getLatLngFromLocationName(context, location, Locale("it"))
                 onSave(
                     stop.copy(
                         title = title,
                         date = date,
                         location = location,
+                        latitude = coords?.first,
+                        longitude = coords?.second,
                         free = free,
                         activities = activities
                     )
                 )
-            }) {
+            },
+                enabled = isInputValid,
+                colors = ButtonDefaults.elevatedButtonColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                ),) {
                 Text("Save")
             }
         },
         dismissButton = {
-            Button(onClick = onDismiss) {
+            Button(
+                onClick = onDismiss,
+                colors = ButtonDefaults.elevatedButtonColors(
+                    containerColor = ButtonRed,
+                    contentColor = MaterialTheme.colorScheme.onSecondary
+                ),
+            ) {
                 Text("Cancel")
             }
         }
@@ -1502,10 +1651,11 @@ fun SpotsSelector(onSpotsChange: (Int) -> Unit, vm: HandleTravelProposalScreenVi
             contentDescription = "Decrement",
             modifier = Modifier
                 .background(
-                    color = MaterialTheme.colorScheme.primary,
+                    color = MaterialTheme.colorScheme.primaryContainer,
                     shape = CircleShape // Make it circular
                 )
-                .padding(12.dp)
+                .padding(12.dp),
+            tint = MaterialTheme.colorScheme.onPrimary
         )
     }
     Text(
@@ -1525,10 +1675,11 @@ fun SpotsSelector(onSpotsChange: (Int) -> Unit, vm: HandleTravelProposalScreenVi
             contentDescription = "Increment",
             modifier = Modifier
                 .background(
-                    color = MaterialTheme.colorScheme.primary,
+                    color = MaterialTheme.colorScheme.primaryContainer,
                     shape = CircleShape // Make it circular
                 )
-                .padding(12.dp)
+                .padding(12.dp),
+            tint = MaterialTheme.colorScheme.onPrimary
         )
     }
 }
@@ -1553,7 +1704,7 @@ fun importButton(vm: HandleTravelProposalScreenViewModel) {
         modifier = Modifier
             .size(56.dp)
             .clip(RoundedCornerShape(12.dp))
-            .background(MaterialTheme.colorScheme.primary)
+            .background(MaterialTheme.colorScheme.primaryContainer)
     ) {
         Icon(
             imageVector = Icons.Default.Outbox,
@@ -1566,13 +1717,14 @@ fun importButton(vm: HandleTravelProposalScreenViewModel) {
     if (vm.showImportDialog) {
         val importTrips = vm.allTrips.collectAsState().value
         AlertDialog(
+            containerColor = MaterialTheme.colorScheme.background,
             onDismissRequest = { vm.showImportDialog = false },
             title = { Text("Choose an existing trip") },
             text = {
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(horizontal = 16.dp)
+                        .padding(horizontal = 4.dp)
                 ) {
                     println(importTrips.size)
                     items(importTrips) { trip ->
@@ -1594,6 +1746,9 @@ fun importButton(vm: HandleTravelProposalScreenViewModel) {
 
 
                             )
+                    }
+                    item {
+                        Spacer(Modifier.height(20.dp))
                     }
                 }
 
@@ -1620,14 +1775,23 @@ fun importButton(vm: HandleTravelProposalScreenViewModel) {
                     vm.resetStep()
 
                     vm.showImportDialog = false
-                }) {
+                },
+                    colors = ButtonDefaults.elevatedButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimary
+                    ),
+                ) {
                     Text("Import")
                 }
             },
             dismissButton = {
                 Button(onClick = {
                     vm.showImportDialog = false
-                }) {
+                },
+                    colors = ButtonDefaults.elevatedButtonColors(
+                        containerColor = ButtonRed,
+                        contentColor = MaterialTheme.colorScheme.onSecondary
+                    ),) {
                     Text("Cancel")
                 }
             }
@@ -1653,14 +1817,13 @@ fun TripSectionForImport(
     Card(
         modifier = modifier
             .padding(horizontal = 2.dp)
-            .clickable { onClick() }
-            .border(
-                2.dp,
-                if (selected) MaterialTheme.colorScheme.primary else Color.Transparent,
-                RoundedCornerShape(16.dp)
-            ),
+            .clickable { onClick() },
         shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(4.dp)
+        elevation = CardDefaults.cardElevation(4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = if (selected) MaterialTheme.colorScheme.surfaceContainer else MaterialTheme.colorScheme.surfaceVariant,
+            contentColor = if (selected) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurface
+        )
     ) {
         val fontTitle = MaterialTheme.typography.titleMedium
         val fontBody = if (portrait) {
@@ -1746,6 +1909,7 @@ fun TripSectionForImport(
                         Spacer(Modifier.width(4.dp))
                         Text("Spots left: $spotsLeft", style = fontBody)
                     }
+                    /*
                     Spacer(Modifier.height(10.dp))
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(
@@ -1755,6 +1919,7 @@ fun TripSectionForImport(
                         )
                         Spacer(Modifier.width(4.dp))
                     }
+                    */
                 }
             }
         }
@@ -1768,6 +1933,10 @@ fun TopBar(navController: NavController, show: Boolean = true, initializeHandle:
     val isLogged by viewModelHandle.isUserLoggedIn.collectAsState()
     val userId by viewModelHandle.userId.collectAsState()
 
+    val coroutineScope = rememberCoroutineScope()
+    val backPressedRecently = remember { mutableStateOf(false) }
+    val listPressedRecently = remember { mutableStateOf(false) }
+
     TopAppBar(
         title = {
             Box(
@@ -1775,25 +1944,50 @@ fun TopBar(navController: NavController, show: Boolean = true, initializeHandle:
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    text = "TravelApp",
+                    text = stringResource(id = R.string.app_name),
+                    color = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.clickable {
-                        navController.navigate("list")
+                        if (!listPressedRecently.value) {
+                            listPressedRecently.value = true
+
+                            coroutineScope.launch {
+                                delay(500)
+                                listPressedRecently.value = false
+                            }
+
+                            navController.navigate("list") {
+                                launchSingleTop = true
+                            }
+                        }
                     }
                 )
             }
         },
-        colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primary,
+            titleContentColor = MaterialTheme.colorScheme.onPrimary,
+            navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+            actionIconContentColor = MaterialTheme.colorScheme.onPrimary
+        ),
         navigationIcon = {
             if (show) {
                 IconButton(onClick = {
-                    if(initializeHandle){
-                        viewModelHandle.initialized = false
+                    if (!backPressedRecently.value) {
+                        backPressedRecently.value = true
+
+                        if (initializeHandle) {
+                            viewModelHandle.initialized = false
+                        } else if (initializeReview) {
+                            viewModelReview.initialized = false
+                            viewModelReview.resetAllFields()
+                        }
+                        navController.popBackStack()
+
+                        coroutineScope.launch {
+                            delay(500)
+                            backPressedRecently.value = false
+                        }
                     }
-                    else if(initializeReview){
-                        viewModelReview.initialized = false
-                        viewModelReview.resetAllFields()
-                    }
-                    navController.popBackStack()
                 }) {
                     Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
                 }
@@ -1803,9 +1997,13 @@ fun TopBar(navController: NavController, show: Boolean = true, initializeHandle:
             if (isLogged) {
                 IconButton(onClick = {
                     if (isLogged) {
-                        navController.navigate("notifications")
+                        navController.navigate("notifications") {
+                            launchSingleTop = true
+                        }
                     } else {
-                        navController.navigate("login")
+                        navController.navigate("login") {
+                            launchSingleTop = true
+                        }
                     }
                 }) {
                     Icon(Icons.Default.Notifications, contentDescription = "Notifications")
@@ -1813,9 +2011,13 @@ fun TopBar(navController: NavController, show: Boolean = true, initializeHandle:
             }
             IconButton(onClick = {
                 if (isLogged){
-                    navController.navigate("profile/${userId}")
+                    navController.navigate("profile/${userId}") {
+                        launchSingleTop = true
+                    }
                 }else{
-                    navController.navigate("login")
+                    navController.navigate("login") {
+                        launchSingleTop = true
+                    }
                 }
             }) {
                 Icon(Icons.Filled.AccountCircle, contentDescription = "Profile")
