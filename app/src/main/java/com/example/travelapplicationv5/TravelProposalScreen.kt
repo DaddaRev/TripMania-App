@@ -100,6 +100,7 @@ import androidx.navigation.NavController
 import coil3.compose.rememberAsyncImagePainter
 import io.github.jan.supabase.realtime.Column
 import com.example.travelapplicationv5.ui.theme.ButtonRed
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -173,11 +174,23 @@ class TravelProposalScreenViewModel (val model: TripModel, val userModel: UserMo
         return model.isJoined(tripToShow.value.id, userId)
     }
 
+    /*
     fun isCurrentUserAccepted(): Boolean {
         val currentUserId = userId.value ?: return false
         return tripToShow.value.requests.any { request ->
             request.status == RequestStatus.Accepted && request.user.id == currentUserId
         }
+    }
+     */
+    val isCurrentUserAccepted: Flow<Boolean> = combine(
+        tripToShow,
+        userId
+    ) { trip, userId ->
+        userId?.let { uid ->
+            trip.requests.any {
+                it.status == RequestStatus.Accepted && it.user.id == uid
+            }
+        } ?: false
     }
 
     fun isRefused(userId: Int) : Boolean {
@@ -756,6 +769,7 @@ fun TripSection(navController: NavController, vm: TravelProposalScreenViewModel 
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val isCurrentUserAccepted by vm.isCurrentUserAccepted.collectAsState(initial = false)
 
     Row(modifier = Modifier.fillMaxWidth()) {
         Column(modifier = Modifier.weight(1f)) {
@@ -964,10 +978,12 @@ fun TripSection(navController: NavController, vm: TravelProposalScreenViewModel 
                         )
                     }
                 }
-
                 item{
-                    if(vm.isCurrentUserAccepted() || (isLogged && owned)){
+
+                    println("DEBUG currentuser:${isCurrentUserAccepted} || (logged ${isLogged} , owned ${owned})")
+                    if(isCurrentUserAccepted || (isLogged && owned)){
                         Spacer(modifier = Modifier.height(6.dp))
+
                         TelegramInviteButton(trip = trip, isLandscape)
                     }
                 }
@@ -1162,6 +1178,7 @@ fun MembersSection(navController: NavController, vm: TravelProposalScreenViewMod
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val isCurrentUserAccepted by vm.isCurrentUserAccepted.collectAsState(initial = false)
 
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
@@ -1401,7 +1418,7 @@ fun MembersSection(navController: NavController, vm: TravelProposalScreenViewMod
                 }
             }
         }
-        else if(isLogged && vm.isCurrentUserAccepted()) {
+        else if(isLogged && isCurrentUserAccepted) {
             FloatingActionButton(
                 onClick = {
                     navController.navigate("newReviewMembers/${trip.id}")
@@ -1460,6 +1477,7 @@ fun ReviewsSection(navController: NavController, vm: TravelProposalScreenViewMod
     val context = LocalContext.current
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+    val isCurrentUserAccepted by vm.isCurrentUserAccepted.collectAsState(initial = false)
 
     Box(modifier = Modifier.fillMaxSize()) {
         LazyColumn(
@@ -1570,7 +1588,7 @@ fun ReviewsSection(navController: NavController, vm: TravelProposalScreenViewMod
                 }
             }
         }
-        else if(vm.isCurrentUserAccepted()){
+        else if(isCurrentUserAccepted){
             FloatingActionButton(
                 onClick = {
                     if(isLogged) {

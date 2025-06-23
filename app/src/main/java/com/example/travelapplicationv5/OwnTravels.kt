@@ -527,7 +527,9 @@ fun TripSectionOwn(
                         Icon(Icons.Default.Notifications, contentDescription = null, Modifier.size(16.dp))
                         Spacer(Modifier.width(4.dp))
 
-                        if(trip.requests.isNotEmpty()){
+                        val pendingRequests = trip.requests.count { it.status == RequestStatus.Pending }
+
+                        if(pendingRequests > 0) {
                             Text("see new applications", style = fontBody, color = Color.Red)
                         } else{
                             Text("No application to see", style = fontBody, color = Color.Black)
