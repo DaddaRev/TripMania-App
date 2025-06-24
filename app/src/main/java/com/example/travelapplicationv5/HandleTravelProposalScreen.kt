@@ -591,15 +591,6 @@ fun NewTravelScreen(
                         Wizard(navController, viewModel)
                     } else {
                         Row(modifier = Modifier.fillMaxSize()) {
-                            Column(
-                                modifier = Modifier
-                                    .weight(0.8f)
-                                    .fillMaxHeight(),
-                                verticalArrangement = Arrangement.Center
-                            ) {
-                                Import(viewModel)
-                                Spacer(Modifier.height(40.dp))
-                            }
                             Column(modifier = Modifier.weight(2f)) {
                                 Wizard(navController, viewModel)
                             }
@@ -709,55 +700,166 @@ private fun Wizard(
         "Provide a detailed itinerary structured by stops"
     )
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        StepIndicator(viewModel)
-        Spacer(modifier = Modifier.height(if (!isLandscape) 12.dp else 5.dp))
+    if (!isLandscape) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            Spacer(modifier = Modifier.height(4.dp))
+            StepIndicator(viewModel)
+            Spacer(modifier = Modifier.height(if (!isLandscape) 12.dp else 5.dp))
 
-        Text(
-            "Step ${step + 1}",
-            fontSize = if (!isLandscape) 22.sp else 15.sp,
-            fontWeight = FontWeight.Bold
-        )
-        if (!isLandscape) {
             Text(
-                text = stepDescription[step],
-                style = MaterialTheme.typography.bodyLarge,
-                color = Color.Gray
+                "Step ${step + 1}",
+                fontSize = if (!isLandscape) 22.sp else 15.sp,
+                fontWeight = FontWeight.Bold
             )
-        }
-        Spacer(modifier = Modifier.height(if (!isLandscape) 15.dp else 5.dp))
+            if (!isLandscape) {
+                Text(
+                    text = stepDescription[step],
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Color.Gray
+                )
+            }
+            Spacer(modifier = Modifier.height(if (!isLandscape) 15.dp else 5.dp))
 
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFF9F9F9)),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-            shape = MaterialTheme.shapes.large
-        ) {
-            AnimatedContent(
-                targetState = step,
-                label = "",
+            Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(if (!isLandscape) 16.dp else 10.dp)
-            ) { currentStep ->
-                when (currentStep) {
-                    0 -> StepOne(viewModel)
-                    1 -> StepTwo(viewModel)
-                    2 -> StepThree(viewModel)
-                    3 -> StepFour(viewModel)
-                    4 -> StepFive(viewModel)
+                    .weight(1f),
+                colors = CardDefaults.cardColors(containerColor = Color(0xFFF9F9F9)),
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                shape = MaterialTheme.shapes.large
+            ) {
+                AnimatedContent(
+                    targetState = step,
+                    label = "",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(if (!isLandscape) 16.dp else 10.dp)
+                ) { currentStep ->
+                    when (currentStep) {
+                        0 -> StepOne(viewModel)
+                        1 -> StepTwo(viewModel)
+                        2 -> StepThree(viewModel)
+                        3 -> StepFour(viewModel)
+                        4 -> StepFive(viewModel)
+                    }
                 }
             }
-        }
 
-        Spacer(modifier = Modifier.height(if (!isLandscape) 15.dp else 5.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Row(horizontalArrangement = Arrangement.Start) {
+            Spacer(modifier = Modifier.height(if (!isLandscape) 15.dp else 5.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Row(horizontalArrangement = Arrangement.Start) {
+                    if (step > 0) {
+                        Button(
+                            onClick = { viewModel.decrementStep() },
+                            colors = ButtonDefaults.elevatedButtonColors(
+                                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                contentColor = MaterialTheme.colorScheme.onPrimary
+                            ),
+                        ) {
+                            Text("Back")
+                        }
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Button(
+                        onClick = {
+                            navController.popBackStack()
+                            viewModel.initialized = false
+                        },
+                        colors = ButtonDefaults.elevatedButtonColors(
+                            containerColor = ButtonRed,
+                            contentColor = MaterialTheme.colorScheme.onSecondary
+                        ),
+                    ) {
+                        Text("Cancel")
+                    }
+
+                }
+
+                if (step < 4) {
+                    Button(
+                        onClick = { viewModel.incrementStep() },
+                        colors = ButtonDefaults.elevatedButtonColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        ),
+                    ) {
+                        Text("Next")
+                    }
+                } else {
+                    Button(
+                        onClick = {
+                            if (viewModel.confirm(context) == true) {
+                                navController.popBackStack()
+                                viewModel.initialized = false
+                            }
+                        },
+                        colors = ButtonDefaults.elevatedButtonColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        ),
+                    ) {
+                        Text("Confirm")
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(if (!isLandscape) 60.dp else 5.dp))
+        }
+    } else {
+        Row(modifier = Modifier.fillMaxSize()) {
+            Spacer(modifier = Modifier.width(12.dp))
+            Column(modifier = Modifier.fillMaxHeight().weight(5f)) {
+                Text(
+                    text = "Step ${step + 1} - ${stepDescription[step]}",
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = Color.Gray
+                )
+                Spacer(modifier = Modifier.height(15.dp))
+
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF9F9F9)),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                    shape = MaterialTheme.shapes.large
+                ) {
+                    AnimatedContent(
+                        targetState = step,
+                        label = "",
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                    ) { currentStep ->
+                        when (currentStep) {
+                            0 -> StepOne(viewModel)
+                            1 -> StepTwo(viewModel)
+                            2 -> StepThree(viewModel)
+                            3 -> StepFour(viewModel)
+                            4 -> StepFive(viewModel)
+                        }
+                    }
+                }
+            }
+
+            Column(
+                modifier = Modifier.fillMaxHeight().weight(0.5f),
+                verticalArrangement = Arrangement.SpaceEvenly,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                StepIndicator(viewModel)
+            }
+
+
+            Column(
+                modifier = Modifier.fillMaxHeight().weight(1f),
+                verticalArrangement = Arrangement.SpaceBetween,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Import(viewModel)
+
                 if (step > 0) {
                     Button(
                         onClick = { viewModel.decrementStep() },
@@ -782,37 +884,35 @@ private fun Wizard(
                 ) {
                     Text("Cancel")
                 }
-
-            }
-
-            if (step < 4) {
-                Button(
-                    onClick = { viewModel.incrementStep() },
-                    colors = ButtonDefaults.elevatedButtonColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    ),
-                ) {
-                    Text("Next")
-                }
-            } else {
-                Button(
-                    onClick = {
-                        if (viewModel.confirm(context) == true) {
-                            navController.popBackStack()
-                            viewModel.initialized = false
-                        }
-                    },
-                    colors = ButtonDefaults.elevatedButtonColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    ),
-                ) {
-                    Text("Confirm")
+                if (step < 4) {
+                    Button(
+                        onClick = { viewModel.incrementStep() },
+                        colors = ButtonDefaults.elevatedButtonColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        ),
+                    ) {
+                        Text("Next")
+                    }
+                } else {
+                    Button(
+                        onClick = {
+                            if (viewModel.confirm(context) == true) {
+                                navController.popBackStack()
+                                viewModel.initialized = false
+                            }
+                        },
+                        colors = ButtonDefaults.elevatedButtonColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        ),
+                    ) {
+                        Text("Confirm")
+                    }
                 }
             }
         }
-        Spacer(modifier = Modifier.height(if (!isLandscape) 60.dp else 5.dp))
+        Spacer(modifier = Modifier.height(if (!isLandscape) 60.dp else 40.dp))
     }
 }
 
@@ -1163,29 +1263,58 @@ private fun StepIndicator(viewModel: HandleTravelProposalScreenViewModel) {
     val step by viewModel.step.collectAsState()
     val errorStep by viewModel.valErrorsStep.collectAsState()
 
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceEvenly
-    ) {
-        for (i in 0..4) {
-            Box(
-                modifier = Modifier
-                    .size(if (!isLandscape) 32.dp else 15.dp)
-                    .clickable(enabled = i != step) {
-                        viewModel.setStep(i)
-                    }
-                    .background(
-                        color =
-                            if (i == step) MaterialTheme.colorScheme.primaryContainer
-                            else if (errorStep.contains(i))
-                                ButtonRed
-                            else
-                                Color.LightGray,
-                        shape = CircleShape
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("${i + 1}", color = Color.White)
+    if (!isLandscape) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceEvenly
+        ) {
+            for (i in 0..4) {
+                Box(
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clickable(enabled = i != step) {
+                            viewModel.setStep(i)
+                        }
+                        .background(
+                            color =
+                                if (i == step) MaterialTheme.colorScheme.primaryContainer
+                                else if (errorStep.contains(i))
+                                    ButtonRed
+                                else
+                                    Color.LightGray,
+                            shape = CircleShape
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("${i + 1}", color = Color.White)
+                }
+            }
+        }
+    } else {
+        Column(
+            modifier = Modifier.fillMaxHeight(),
+            verticalArrangement = Arrangement.SpaceEvenly
+        ) {
+            for (i in 0..4) {
+                Box(
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clickable(enabled = i != step) {
+                            viewModel.setStep(i)
+                        }
+                        .background(
+                            color =
+                                if (i == step) MaterialTheme.colorScheme.primaryContainer
+                                else if (errorStep.contains(i))
+                                    ButtonRed
+                                else
+                                    Color.LightGray,
+                            shape = CircleShape
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text("${i + 1}", color = Color.White)
+                }
             }
         }
     }
@@ -1473,51 +1602,53 @@ fun EditStop(
         title = { Text("Edit Stop") },
         containerColor = MaterialTheme.colorScheme.background,
         text = {
-            Column {
-                OutlinedTextField(
-                    value = title,
-                    onValueChange = { title = it },
-                    label = { Text("Title") },
-                    placeholder = { Text("Stop title") }
-                )
+            LazyColumn {
+                item {
+                    OutlinedTextField(
+                        value = title,
+                        onValueChange = { title = it },
+                        label = { Text("Title") },
+                        placeholder = { Text("Stop title") }
+                    )
 
-                OutlinedTextField(
-                    value = location,
-                    onValueChange = { location = it },
-                    label = { Text("Location") },
-                    placeholder = { Text("e.g. Uffizi, Florence, Italy") }
-                )
-                Spacer(Modifier.height(6.dp))
-                Button(
-                    onClick = { pickDate = true },
-                    modifier = Modifier.fillMaxWidth(),
-                    colors = ButtonDefaults.elevatedButtonColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
-                    ),
-                ) {
-                    Text(
-                        date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
-                            ?: "Select start date"
+                    OutlinedTextField(
+                        value = location,
+                        onValueChange = { location = it },
+                        label = { Text("Location") },
+                        placeholder = { Text("e.g. Uffizi, Florence, Italy") }
+                    )
+                    Spacer(Modifier.height(6.dp))
+                    Button(
+                        onClick = { pickDate = true },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.elevatedButtonColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            contentColor = MaterialTheme.colorScheme.onPrimary
+                        ),
+                    ) {
+                        Text(
+                            date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                                ?: "Select start date"
+                        )
+                    }
+
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Checkbox(
+                            checked = free,
+                            onCheckedChange = { free = it }
+                        )
+                        Text("Free")
+                    }
+
+                    OutlinedTextField(
+                        value = activities,
+                        onValueChange = { activities = it },
+                        label = { Text("Activities") },
+                        placeholder = { Text("Suggested activities (e.g., climbing, skiing attraction seeking, exploring the city….)") },
+                        minLines = 3,
+                        maxLines = 5,
                     )
                 }
-
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Checkbox(
-                        checked = free,
-                        onCheckedChange = { free = it }
-                    )
-                    Text("Free")
-                }
-
-                OutlinedTextField(
-                    value = activities,
-                    onValueChange = { activities = it },
-                    label = { Text("Activities") },
-                    placeholder = { Text("Suggested activities (e.g., climbing, skiing attraction seeking, exploring the city….)") },
-                    minLines = 3,
-                    maxLines = 5,
-                )
             }
         },
         confirmButton = {

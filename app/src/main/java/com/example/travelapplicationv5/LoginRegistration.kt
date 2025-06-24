@@ -2,6 +2,7 @@ package com.example.travelapplicationv5
 
 import android.app.Activity.RESULT_OK
 import android.content.Intent
+import android.content.res.Configuration
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -37,7 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.compose.runtime.getValue
-
+import androidx.compose.ui.platform.LocalConfiguration
 
 
 @Composable
@@ -49,6 +50,9 @@ fun LogInScreen(
     val context = LocalContext.current
     val authPhase by viewModel.authPhase.collectAsState()
     val authError by viewModel.authError.collectAsState()
+
+    val configuration = LocalConfiguration.current
+    val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
@@ -97,7 +101,12 @@ fun LogInScreen(
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Bold
             )
-            Spacer(modifier = Modifier.height(150.dp))
+
+            if(!isLandscape) {
+                Spacer(modifier = Modifier.height(150.dp))
+            } else {
+                Spacer(modifier = Modifier.height(70.dp))
+            }
             Button(
                 onClick = {
                     if (viewModel.isUserLoggedIn.value) {

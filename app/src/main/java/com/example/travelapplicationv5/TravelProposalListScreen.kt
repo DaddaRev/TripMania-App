@@ -606,19 +606,25 @@ fun SearchBarCustom(viewModel: TravelProposalListScreenViewModel) {
     }
 
     if (additionalFilters) {
-        Column(
+        LazyColumn(
             Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
         ) {
-            Text("Group Size", style = MaterialTheme.typography.bodyMedium)
-            FilterChipRow(groupDimensionChips, "group", selectedGroupDimensionChips, viewModel)
+            item {
+                Text("Group Size", style = MaterialTheme.typography.bodyMedium)
+                FilterChipRow(groupDimensionChips, "group", selectedGroupDimensionChips, viewModel)
+            }
 
-            Text("Price", style = MaterialTheme.typography.bodyMedium)
-            FilterChipRow(priceChips, "price", selectedPriceChips, viewModel)
+            item {
+                Text("Price", style = MaterialTheme.typography.bodyMedium)
+                FilterChipRow(priceChips, "price", selectedPriceChips, viewModel)
+            }
 
-            Text("Duration", style = MaterialTheme.typography.bodyMedium)
-            FilterChipRow(durationChips, "duration", selectedDurationChip, viewModel)
+            item {
+                Text("Duration", style = MaterialTheme.typography.bodyMedium)
+                FilterChipRow(durationChips, "duration", selectedDurationChip, viewModel)
+            }
         }
     }
 
