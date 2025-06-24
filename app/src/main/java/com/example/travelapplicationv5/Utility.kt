@@ -536,16 +536,16 @@ object Utility {
                 ),
                 reviews = listOf(
                     Review(
-                        user5,
-                        5,
-                        "A trip of a lifetime! Dubai is a city like no other.",
-                        "Make sure to book your tickets to Burj Khalifa early."
+                        author = user5,
+                        rating = 5,
+                        body = "A trip of a lifetime! Dubai is a city like no other.",
+                        tips = "Make sure to book your tickets to Burj Khalifa early."
                     ),
                     Review(
-                        user6,
-                        4,
-                        "Fantastic experience, but the desert safari could have been longer.",
-                        "Definitely worth visiting during the cooler months."
+                        author = user6,
+                        rating = 4,
+                        body = "Fantastic experience, but the desert safari could have been longer.",
+                        tips = "Definitely worth visiting during the cooler months."
                     )
                 ),
                 memberReviews = listOf(
@@ -657,12 +657,16 @@ object Utility {
                     )
                 ),
                 reviews = listOf(
-                    Review(user3, 5, "Best trip of my life!", "Don't miss Queenstown!"),
                     Review(
-                        user5,
-                        4,
-                        "Incredible landscapes, perfect for adventurers.",
-                        "Pack warm clothes!"
+                        author = user3,
+                        rating = 5,
+                        body = "Best trip of my life!",
+                        tips = "Don't miss Queenstown!"),
+                    Review(
+                        author = user5,
+                        rating = 4,
+                        body = "Incredible landscapes, perfect for adventurers.",
+                        tips = "Pack warm clothes!"
                     )
                 ),
                 memberReviews = listOf(
@@ -769,16 +773,16 @@ object Utility {
                 ),
                 reviews = listOf(
                     Review(
-                        annaSmith,
-                        5,
-                        "An unforgettable cultural immersion. The Sahara was magical.",
-                        "Bring sunscreen and a good camera!"
+                        author = annaSmith,
+                        rating = 5,
+                        body = "An unforgettable cultural immersion. The Sahara was magical.",
+                        tips = "Bring sunscreen and a good camera!"
                     ),
                     Review(
-                        user2,
-                        4,
-                        "Loved the food and the people. Marrakech is chaotic but fun.",
-                        "Be ready to negotiate prices everywhere."
+                        author = user2,
+                        rating = 4,
+                        body = "Loved the food and the people. Marrakech is chaotic but fun.",
+                        tips = "Be ready to negotiate prices everywhere."
                     )
                 ),
                 memberReviews = listOf(
@@ -878,16 +882,16 @@ object Utility {
                 ),
                 reviews = listOf(
                     Review(
-                        user6,
-                        5,
-                        "The cherry blossoms were breathtaking!",
-                        "Visit during Sakura season!"
+                        author = user6,
+                        rating = 5,
+                        body = "The cherry blossoms were breathtaking!",
+                        tips = "Visit during Sakura season!"
                     ),
                     Review(
-                        user4,
-                        4,
-                        "Amazing cultural experience.",
-                        "Learn basic Japanese phrases!"
+                        author = user4,
+                        rating = 4,
+                        body = "Amazing cultural experience.",
+                        tips = "Learn basic Japanese phrases!"
                     )
                 ),
                 memberReviews = listOf(
@@ -987,16 +991,16 @@ object Utility {
                 ),
                 reviews = listOf(
                     Review(
-                        annaSmith,
-                        5,
-                        "A dream come true for food and art lovers!",
-                        "Comfortable walking shoes are a must!"
+                        author = annaSmith,
+                        rating = 5,
+                        body = "A dream come true for food and art lovers!",
+                        tips = "Comfortable walking shoes are a must!"
                     ),
                     Review(
-                        user8,
-                        4,
-                        "Romantic and unforgettable experience.",
-                        "Try local trattorias instead of tourist spots."
+                        author =user8,
+                        rating = 4,
+                        body = "Romantic and unforgettable experience.",
+                        tips = "Try local trattorias instead of tourist spots."
                     )
                 ),
                 memberReviews = listOf(
@@ -1096,16 +1100,16 @@ object Utility {
                 ),
                 reviews = listOf(
                     Review(
-                        user7,
-                        5,
-                        "Absolutely incredible wildlife sightings!",
-                        "Pack a good camera and binoculars."
+                        author = user7,
+                        rating = 5,
+                        body = "Absolutely incredible wildlife sightings!",
+                        tips = "Pack a good camera and binoculars."
                     ),
                     Review(
-                        user4,
-                        5,
-                        "Bucket-list trip, highly recommended!",
-                        "Bring layered clothing for cold mornings."
+                        author = user4,
+                        rating = 5,
+                        body = "Bucket-list trip, highly recommended!",
+                        tips = "Bring layered clothing for cold mornings."
                     )
                 ),
                 memberReviews = listOf(
@@ -1210,16 +1214,16 @@ object Utility {
                 ),
                 reviews = listOf(
                     Review(
-                        user2,
-                        5,
-                        "Every stop was iconic and unforgettable!",
-                        "Plan extra time for Yosemite trails."
+                        author = user2,
+                        rating = 5,
+                        body = "Every stop was iconic and unforgettable!",
+                        tips = "Plan extra time for Yosemite trails."
                     ),
                     Review(
-                        user5,
-                        4,
-                        "Perfect mix of cities and nature.",
-                        "Book Grand Canyon tickets early!"
+                        author = user5,
+                        rating = 4,
+                        body = "Perfect mix of cities and nature.",
+                        tips = "Book Grand Canyon tickets early!"
                     )
                 ),
                 memberReviews = listOf(
@@ -1320,16 +1324,16 @@ object Utility {
                 ),
                 reviews = listOf(
                     Review(
-                        user2,
-                        5,
-                        "The most relaxing vacation ever!",
-                        "Bring reef-safe sunscreen!"
+                        author = user2,
+                        rating = 5,
+                        body = "The most relaxing vacation ever!",
+                        tips = "Bring reef-safe sunscreen!"
                     ),
                     Review(
-                        user8,
-                        5,
-                        "Pure paradise, unforgettable sunsets!",
-                        "Try a traditional Maldivian dinner."
+                        author = user8,
+                        rating = 5,
+                        body = "Pure paradise, unforgettable sunsets!",
+                        tips = "Try a traditional Maldivian dinner."
                     )
                 ),
                 memberReviews = listOf(
@@ -1423,16 +1427,16 @@ object Utility {
                 ),
                 reviews = listOf(
                     Review(
-                        user6,
-                        5,
-                        "Machu Picchu was breathtaking and Uyuni surreal!",
-                        "Acclimate for altitude first!"
+                        author = user6,
+                        rating = 5,
+                        body = "Machu Picchu was breathtaking and Uyuni surreal!",
+                        tips = "Acclimate for altitude first!"
                     ),
                     Review(
-                        user7,
-                        4,
-                        "Spectacular views, but very tiring trip.",
-                        "Bring good hiking shoes!"
+                        author = user7,
+                        rating = 4,
+                        body = "Spectacular views, but very tiring trip.",
+                        tips = "Bring good hiking shoes!"
                     )
                 ),
                 memberReviews = listOf(
@@ -1538,16 +1542,16 @@ object Utility {
                 ),
                 reviews = listOf(
                     Review(
-                        user4,
-                        5,
-                        "Seeing the Aurora Borealis was magical!",
-                        "Dress extremely warmly, it's freezing!"
+                        author = user4,
+                        rating = 5,
+                        body = "Seeing the Aurora Borealis was magical!",
+                        tips = "Dress extremely warmly, it's freezing!"
                     ),
                     Review(
-                        user2,
-                        4,
-                        "Perfect winter wonderland trip.",
-                        "Tromsø is the best for northern lights!"
+                        author = user2,
+                        rating = 4,
+                        body = "Perfect winter wonderland trip.",
+                        tips = "Tromsø is the best for northern lights!"
                     )
                 ),
                 memberReviews = listOf(

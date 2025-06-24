@@ -97,17 +97,33 @@
         )
     }
 
+    fun replyReviewFromFirebase(data: Map<String, Any?>, users: List<UserProfile>): ReplyReview {
+        val authorId = data["author"] as? Long
+        val author = users.find { it.id == authorId?.toInt() } ?: UserProfile()
+
+        return ReplyReview(
+            author = author,
+            reply = data["reply"] as? String ?: "",
+        )
+    }
 
     fun reviewFromFirebase(data: Map<String, Any?>, users: List<UserProfile>): Review {
         val authorId = data["author"] as? Long
         val author = users.find { it.id == authorId?.toInt() } ?: UserProfile()
 
         return Review(
+            id = (data["id"] as Long).toInt(),
             author = author,
             rating = (data["rating"] as Long).toInt(),
             body = data["body"] as? String ?: "",
             tips = data["tips"] as? String ?: "",
-            images = data["images"] as? List<String> ?: emptyList()
+            images = data["images"] as? List<String> ?: emptyList(),
+            replies = (data["replies"] as? List<Map<String, Any?>>)?.map {
+                replyReviewFromFirebase(
+                    it,
+                    users
+                )
+            } ?: emptyList(),
         )
     }
 
@@ -254,11 +270,17 @@
             },
             "reviews" to trip.reviews.map { rev ->
                 mapOf(
+                    "id" to rev.id.toLong(),
                     "author" to rev.author.id.toLong(),
                     "rating" to rev.rating.toLong(),
                     "body" to rev.body,
                     "tips" to rev.tips,
-                    "images" to rev.images
+                    "images" to rev.images,
+                    "replies" to rev.replies.map { rep ->
+                        mapOf("author" to rep.author.id.toLong(),
+                        "reply" to rep.reply
+                        )
+                    }
                 )
             },
             "memberReviews" to trip.memberReviews.map { rev ->
@@ -734,21 +756,31 @@
         )
     }
 
+    @Parcelize
+    data class ReplyReview(
+        val author: UserProfile,
+        var reply: String
+    ) : Parcelable
+
     // Data class to store a single review
     @Parcelize
     data class Review(
+        val id: Int = 0,
         val author: UserProfile,
         var rating: Int,
         var body: String,
         var tips: String,
-        var images: List<String> = emptyList()
+        var images: List<String> = emptyList(),
+        var replies: List<ReplyReview> = emptyList(),
     ) : Parcelable {
         constructor(author: UserProfile, rating: Int) : this(
+            id = 0,
             author = author,
             rating = rating,
             body = "",
             tips = "",
-            images = emptyList()
+            images = emptyList(),
+            replies = emptyList()
         )
     }
 
@@ -1093,20 +1125,60 @@
                 if (doc != null) {
                     // Otteniamo la lista attuale delle recensioni dal DB, o la creiamo se nulla
                     val currentReviews = (doc.get("reviews") as? List<Map<String, Any?>>) ?: emptyList()
+                    val nextId = currentReviews.size
 
                     // Convertiamo la review da Kotlin a Map
                     val reviewMap = mapOf(
+                        "id" to nextId.toLong(),
                         "author" to userId?.toLong(),
                         "rating" to rating.toLong(),
                         "body" to body,
                         "tips" to tips,
-                        "images" to images
+                        "images" to images,
+                        "replies" to emptyList<ReplyReview>()
                     )
 
                     // Nuova lista con la review aggiunta
                     val updatedReviews = currentReviews + reviewMap
 
                     // Aggiorna il campo reviews
+                    doc.reference.update("reviews", updatedReviews)
+                        .addOnSuccessListener {
+                            Log.d("TripModel", "Review aggiunta con successo su Firebase")
+                        }
+                        .addOnFailureListener { e ->
+                            Log.e("TripModel", "Errore aggiunta review su Firebase: ${e.message}")
+                        }
+                }
+            }.addOnFailureListener {
+                Log.e("TripModel", "Errore ricerca viaggio per aggiungere review: ${it.message}")
+            }
+        }
+
+        fun addReplyReview(tripId: Int, reviewId: Int, reply: String) {
+            val tripDocQuery = Collections.trips.whereEqualTo("id", tripId).limit(1)
+            tripDocQuery.get().addOnSuccessListener { querySnapshot ->
+                val doc = querySnapshot.documents.firstOrNull()
+                if (doc != null) {
+
+                    val reviews = (doc.get("reviews") as? List<Map<String, Any?>>) ?: emptyList()
+
+                    val updatedReviews = reviews.map { review ->
+                        if (review["id"] == reviewId.toLong()) {
+
+                            val oldReplies = review["replies"] as? List<Map<String, Any>> ?: emptyList()
+
+                            val newReply = mapOf(
+                                "author" to userId.value?.toLong(),
+                                "reply" to reply,
+                            )
+                            val updatedReplies = oldReplies + newReply
+                            review.toMutableMap().apply { this["replies"] = updatedReplies }
+                        } else {
+                            review
+                        }
+                    }
+
                     doc.reference.update("reviews", updatedReviews)
                         .addOnSuccessListener {
                             Log.d("TripModel", "Review aggiunta con successo su Firebase")

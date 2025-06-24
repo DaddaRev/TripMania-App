@@ -59,6 +59,7 @@ import android.content.res.Configuration
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -110,6 +111,11 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import androidx.compose.material3.TextField
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalFocusManager
+
 
 class TravelProposalScreenViewModel (val model: TripModel, val userModel: UserModel, val notificationModel: NotificationModel) : ViewModel()
 {
@@ -289,6 +295,10 @@ class TravelProposalScreenViewModel (val model: TripModel, val userModel: UserMo
 
     fun isRemoved(userId: Int) : Boolean {
         return userModel.isRemoved(userId)
+    }
+
+    fun addReplyReview(tripId: Int, reviewId: Int, reply: String){
+        model.addReplyReview(tripId, reviewId, reply)
     }
 
     val savedTrips: StateFlow<List<Int>> = combine(
@@ -1472,9 +1482,14 @@ fun ReviewsSection(navController: NavController, vm: TravelProposalScreenViewMod
 
     var selectedImages by remember { mutableStateOf<List<String>>(emptyList()) }
 
+    val expandedStates = remember { mutableStateMapOf<Int, Boolean>() }
+    var replyToReviewId by remember { mutableStateOf<Int?>(null) }
+    var replyText by remember { mutableStateOf("") }
+    val focusRequester = remember { FocusRequester() }
+    val focusManager = LocalFocusManager.current
+
     val generalRating = vm.calculateRatingAverage(trip)
 
-    val context = LocalContext.current
     val configuration = LocalConfiguration.current
     val isLandscape = configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
     val isCurrentUserAccepted by vm.isCurrentUserAccepted.collectAsState(initial = false)
@@ -1509,7 +1524,7 @@ fun ReviewsSection(navController: NavController, vm: TravelProposalScreenViewMod
             items(trip.reviews.size) { index ->
                 val review = trip.reviews[index]
                 val removed = vm.isRemoved(review.author.id)
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(8.dp))
                 Row(
                     modifier = Modifier
                         .fillMaxWidth().padding(vertical = 4.dp),
@@ -1539,9 +1554,102 @@ fun ReviewsSection(navController: NavController, vm: TravelProposalScreenViewMod
                         Text("See photos (${review.images.size})")
                     }
                 }
+                val currentState = expandedStates[review.id] ?: false
+                Row {
+                    if (isCurrentUserAccepted) {
+                        TextButton(onClick = {
+                            replyToReviewId = review.id
+                            replyText = ""
+                        }) {
+                            Text("Reply")
+                        }
+                    }
+                    if (review.replies.isNotEmpty()) {
+                        TextButton(onClick = {
+                            expandedStates[review.id] = !currentState
+                        }) {
+                            Text(if (expandedStates[review.id] == true) "Hide replies" else "Show replies")
+                        }
+                    }
+                }
+                if (review.replies.isNotEmpty() && currentState == true) {
+                    Column(modifier = Modifier.padding(start = 16.dp)) {
+                        review.replies.forEach { reply ->
+                            val removed2 = vm.isRemoved(reply.author.id)
+                            Spacer(modifier = Modifier.height(8.dp))
+                            UserData(navController, vm, reply.author, removed2)
+                            Text(
+                                text = reply.reply,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                    }
+                }
             }
             item {
                 Spacer(modifier = Modifier.height(140.dp))
+            }
+        }
+        replyToReviewId?.let { reviewId ->
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                tonalElevation = 4.dp,
+                shadowElevation = 8.dp
+            ) {
+                Column(modifier = Modifier.padding(8.dp)) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        val authorName = trip.reviews[reviewId].author.nickname
+                        Text(
+                            text = "Replying to $authorName",
+                            modifier = Modifier.weight(1f)
+                        )
+                        IconButton(
+                            onClick = {
+                                replyToReviewId = null
+                                replyText = ""
+                            }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = "Cancel reply"
+                            )
+                        }
+                    }
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        TextField(
+                            value = replyText,
+                            onValueChange = { replyText = it },
+                            placeholder = { Text("Write your reply...") },
+                            modifier = Modifier
+                                .weight(1f)
+                                .padding(end = 8.dp)
+                                .focusRequester(focusRequester)
+                        )
+
+                        Button(
+                            onClick = {
+                                vm.addReplyReview(trip.id, reviewId, replyText)
+                                expandedStates[reviewId] = true
+                                replyToReviewId = null
+                                replyText = ""
+                            },
+                            enabled = replyText.isNotBlank(),
+                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
+                            modifier = Modifier.height(IntrinsicSize.Min)
+                        ) {
+                            Text("Send")
+                        }
+                    }
+                }
+            }
+
+            LaunchedEffect(Unit) {
+                focusRequester.requestFocus()
             }
         }
         if (isLogged && owned){
