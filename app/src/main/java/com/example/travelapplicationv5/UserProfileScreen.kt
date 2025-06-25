@@ -1346,7 +1346,7 @@ fun UserInfoColumn(
             }
         }*/
 
-        Spacer(modifier = Modifier.height(7.dp))
+        //Spacer(modifier = Modifier.height(7.dp))
         //Full name:
         Text(
             text = "${userProfile.firstName} ${userProfile.lastName}",

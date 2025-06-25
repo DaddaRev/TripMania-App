@@ -1049,27 +1049,29 @@ fun TripSection(navController: NavController, vm: TravelProposalScreenViewModel 
             }
         }
         if (isLogged && owned){
-            FloatingActionButton(
-                onClick = {
-                    navController.navigate("handle/edit?tripId=${trip.id}")
-                },
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(bottom = if (isLandscape) 75.dp else 85.dp)
-                    .size(50.dp),
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = Color.White,
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(horizontal = 12.dp)
+            if (trip.date.first.isAfter(LocalDate.now())) {
+                FloatingActionButton(
+                    onClick = {
+                        navController.navigate("handle/edit?tripId=${trip.id}")
+                    },
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(bottom = if (isLandscape) 75.dp else 85.dp)
+                        .size(50.dp),
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = Color.White,
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = "Edit"
-                    )
-                    //Spacer(modifier = Modifier.width(8.dp))
-                    //Text(text = "Edit")
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(horizontal = 12.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = "Edit"
+                        )
+                        //Spacer(modifier = Modifier.width(8.dp))
+                        //Text(text = "Edit")
+                    }
                 }
             }
             FloatingActionButton(
@@ -1265,27 +1267,33 @@ fun MembersSection(navController: NavController, vm: TravelProposalScreenViewMod
                             imageVector = Icons.Default.Star,
                             contentDescription = "star"
                         )
-                        Spacer(modifier = Modifier.width(12.dp))
-                        IconButton(onClick = {
-                            if (spotsLeft>=(request.companion+1)) {
-                                vm.acceptRequest(request.user.id)
-                            }else {
-                                Toast.makeText(context, "No spots available", Toast.LENGTH_SHORT).show()
+                        if (trip.date.first.isAfter(LocalDate.now())) {
+                            Spacer(modifier = Modifier.width(12.dp))
+                            IconButton(onClick = {
+                                if (spotsLeft >= (request.companion + 1)) {
+                                    vm.acceptRequest(request.user.id)
+                                } else {
+                                    Toast.makeText(
+                                        context,
+                                        "No spots available",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
                             }
-                        }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.CheckCircle,
-                                contentDescription = "accept",
-                                tint = Color.Green
-                            )
-                        }
-                        IconButton(onClick = { vm.denyRequest(request.user.id) }) {
-                            Icon(
-                                imageVector = Icons.Default.Cancel,
-                                contentDescription = "deny",
-                                tint = Color.Red
-                            )
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.CheckCircle,
+                                    contentDescription = "accept",
+                                    tint = Color.Green
+                                )
+                            }
+                            IconButton(onClick = { vm.denyRequest(request.user.id) }) {
+                                Icon(
+                                    imageVector = Icons.Default.Cancel,
+                                    contentDescription = "deny",
+                                    tint = Color.Red
+                                )
+                            }
                         }
                     }
                     if (request.companion>0) {
@@ -1365,7 +1373,7 @@ fun MembersSection(navController: NavController, vm: TravelProposalScreenViewMod
                         imageVector = Icons.Default.Star,
                         contentDescription = "star"
                     )
-                    if (owned) {
+                    if (owned && trip.date.first.isAfter(LocalDate.now())) {
                         Spacer(modifier = Modifier.width(12.dp))
                         IconButton(onClick = { vm.denyRequest(request.user.id) }) {
                             Icon(
@@ -1433,25 +1441,27 @@ fun MembersSection(navController: NavController, vm: TravelProposalScreenViewMod
             }
         }
         if (isLogged && owned){
-            FloatingActionButton(
-                onClick = {
-                    navController.navigate("handle/edit?tripId=${trip.id}")
-                },
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(bottom = if (isLandscape) 75.dp else 85.dp)
-                    .size(50.dp),
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = Color.White,
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(horizontal = 12.dp)
+            if (trip.date.first.isAfter(LocalDate.now())) {
+                FloatingActionButton(
+                    onClick = {
+                        navController.navigate("handle/edit?tripId=${trip.id}")
+                    },
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(bottom = if (isLandscape) 75.dp else 85.dp)
+                        .size(50.dp),
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = Color.White,
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = "Edit"
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(horizontal = 12.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = "Edit"
+                        )
+                    }
                 }
             }
             FloatingActionButton(
@@ -1702,25 +1712,27 @@ fun ReviewsSection(navController: NavController, vm: TravelProposalScreenViewMod
             }
         }
         if (isLogged && owned){
-            FloatingActionButton(
-                onClick = {
-                    navController.navigate("handle/edit?tripId=${trip.id}")
-                },
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(bottom = if (isLandscape) 75.dp else 85.dp)
-                    .size(50.dp),
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = Color.White,
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(horizontal = 12.dp)
+            if (trip.date.first.isAfter(LocalDate.now())) {
+                FloatingActionButton(
+                    onClick = {
+                        navController.navigate("handle/edit?tripId=${trip.id}")
+                    },
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(bottom = if (isLandscape) 75.dp else 85.dp)
+                        .size(50.dp),
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    contentColor = Color.White,
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Edit,
-                        contentDescription = "Edit"
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(horizontal = 12.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = "Edit"
+                        )
+                    }
                 }
             }
             FloatingActionButton(
