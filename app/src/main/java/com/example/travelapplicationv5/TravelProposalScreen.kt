@@ -1648,7 +1648,9 @@ fun ReviewsSection(navController: NavController, vm: TravelProposalScreenViewMod
                         modifier = Modifier.fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        val authorName = trip.reviews[reviewId].author.nickname
+                        val review = trip.reviews.filter { it.id == reviewId }.firstOrNull()
+                        val author = if (review!=null) review.author else UserProfile()
+                        val authorName = if(author.id!=0) author.nickname else "deleted user"
                         Text(
                             text = "Replying to $authorName",
                             modifier = Modifier.weight(1f)

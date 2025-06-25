@@ -1125,7 +1125,7 @@
                 if (doc != null) {
                     // Otteniamo la lista attuale delle recensioni dal DB, o la creiamo se nulla
                     val currentReviews = (doc.get("reviews") as? List<Map<String, Any?>>) ?: emptyList()
-                    val nextId = currentReviews.size
+                    val nextId = currentReviews.size+1
 
                     // Convertiamo la review da Kotlin a Map
                     val reviewMap = mapOf(
