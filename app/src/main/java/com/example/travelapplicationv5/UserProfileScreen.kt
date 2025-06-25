@@ -1178,59 +1178,70 @@ fun UserInfoActions(
             .wrapContentSize(Alignment.TopEnd),
         contentAlignment = Alignment.CenterEnd
     ) {
-        IconButton(
-            onClick = { expanded = true },
-            modifier = Modifier
-                .padding(start = 8.dp)
-                .size(32.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Default.MoreVert,
-                contentDescription = "More actions",
-            )
-        }
-
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            if (isSelf) {
-                DropdownMenuItem(
-                    text = { Text("Edit profile") },
-                    onClick = {
-                        expanded = false
-                        viewModel.resetErrors()
-                        navController.navigate("editProfile")
-                    },
-                    leadingIcon = { Icon(Icons.Default.Edit, contentDescription = null) }
-                )
-                DropdownMenuItem(
-                    text = { Text("Preferences") },
-                    onClick = {
-                        expanded = false
-                        navController.navigate("editPreferences")
-                    },
-                    leadingIcon = { Icon(Icons.Default.Favorite, contentDescription = null) }
+        if (isSelf) {
+            IconButton(
+                onClick = { expanded = true },
+                modifier = Modifier
+                    .padding(start = 8.dp)
+                    .size(32.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.MoreVert,
+                    contentDescription = "More actions",
                 )
             }
-            DropdownMenuItem(
-                text = { Text("Reviews") },
-                onClick = {
-                    expanded = false
-                    navController.navigate("profileReviews/${userProfile.id}")
-                },
-                leadingIcon = { Icon(Icons.Default.Reviews, contentDescription = null) }
-            )
-            if (isSelf) {
+
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                if (isSelf) {
+                    DropdownMenuItem(
+                        text = { Text("Edit profile") },
+                        onClick = {
+                            expanded = false
+                            viewModel.resetErrors()
+                            navController.navigate("editProfile")
+                        },
+                        leadingIcon = { Icon(Icons.Default.Edit, contentDescription = null) }
+                    )
+                    DropdownMenuItem(
+                        text = { Text("Preferences") },
+                        onClick = {
+                            expanded = false
+                            navController.navigate("editPreferences")
+                        },
+                        leadingIcon = { Icon(Icons.Default.Favorite, contentDescription = null) }
+                    )
+                }
                 DropdownMenuItem(
-                    text = { Text("Logout") },
+                    text = { Text("Reviews") },
                     onClick = {
                         expanded = false
-                        viewModel.userLogOut()
-                        navController.navigate("list")
+                        navController.navigate("profileReviews/${userProfile.id}")
                     },
-                    leadingIcon = { Icon(Icons.Default.ExitToApp, contentDescription = null) }
+                    leadingIcon = { Icon(Icons.Default.Reviews, contentDescription = null) }
                 )
+                if (isSelf) {
+                    DropdownMenuItem(
+                        text = { Text("Logout") },
+                        onClick = {
+                            expanded = false
+                            viewModel.userLogOut()
+                            navController.navigate("list")
+                        },
+                        leadingIcon = { Icon(Icons.Default.ExitToApp, contentDescription = null) }
+                    )
+                }
+            }
+        } else {
+            IconButton(
+                onClick = { navController.navigate("profileReviews/${userProfile.id}") },
+                modifier = Modifier
+                    .padding(start = 8.dp)
+                    .size(32.dp)
+            ) {
+                Icon(Icons.Default.Reviews, contentDescription = null)
             }
         }
     }
