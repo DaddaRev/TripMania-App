@@ -339,7 +339,7 @@ fun NotificationItem(notification: Notification, viewModel: NotificationsViewMod
 fun ImageUserProfile(user: UserProfile) {
 
     val painter = if (user.image != null) {
-        rememberAsyncImagePainter(model = user.image)
+        rememberAsyncImagePainter(model = user.image,  error = painterResource(id = user.imageId ?: R.drawable.avatar1))
     } else {
         if (user.imageId != null) {
             painterResource(id = user.imageId!!)
@@ -347,6 +347,7 @@ fun ImageUserProfile(user: UserProfile) {
             painterResource(id = R.drawable.avatar1)
         }
     }
+
     if (!user.imageMonogram) {
         Image(
             painter = painter,

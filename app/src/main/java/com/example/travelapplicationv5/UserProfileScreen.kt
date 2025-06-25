@@ -1027,9 +1027,15 @@ fun ProfileImage(context: Context, viewModel: UserProfileScreenViewModel, isEdit
                         .background(Color.Cyan),
                     contentAlignment = Alignment.Center
                 ) {
-                    if (userProfile.firstName.isNotBlank() && userProfile.lastName.isNotBlank()) {
+                    if (!isEditing && userProfile.firstName.isNotBlank() && userProfile.lastName.isNotBlank()) {
                         Text(
                             text = "${userProfile.firstName[0]}${userProfile.lastName[0]}",
+                            style = MaterialTheme.typography.headlineLarge
+                        )
+                    }
+                    else if(isEditing && userEditable.firstName.isNotBlank() && userEditable.lastName.isNotBlank()){
+                        Text(
+                            text = "${userEditable.firstName[0]}${userEditable.lastName[0]}",
                             style = MaterialTheme.typography.headlineLarge
                         )
                     }

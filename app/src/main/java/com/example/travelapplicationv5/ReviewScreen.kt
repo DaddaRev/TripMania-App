@@ -399,7 +399,6 @@ fun NewReviewScreen(
     val generalValidation by viewModel.valErrors.collectAsState()
 
     Column(Modifier.fillMaxSize()) {
-        //TODO{check topbar}
         TopBar(navController, initializeReview = true, viewModelReview = viewModel)
         Spacer(modifier = Modifier.height(10.dp))
         Surface(
@@ -444,8 +443,8 @@ fun NewReviewScreen(
                                 // Cancel Button
                                 Button(
                                     onClick = {
-                                        viewModel.resetAllFields()
                                         navController.popBackStack()
+                                        viewModel.resetAllFields()
                                         viewModel.initialized = false
                                     },
                                     modifier = Modifier.weight(1f),
@@ -549,7 +548,7 @@ private fun ImageUpload(viewModel: ReviewTripScreenViewModel) {
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        imageVector = Icons.Default.AddCircle,
+                        imageVector = Icons.Default.Add,
                         contentDescription = "Add Image",
                         tint = MaterialTheme.colorScheme.primaryContainer,
                         modifier = Modifier.size(36.dp)

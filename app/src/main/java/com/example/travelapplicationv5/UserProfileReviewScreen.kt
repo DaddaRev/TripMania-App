@@ -132,7 +132,7 @@ fun DisplayUserReviewScreen(
                         )
                         Text(
                             text = trip.title,
-                            modifier = Modifier.clickable {
+                            modifier = Modifier.padding(top = 2.dp).clickable {
                                 navController.navigate("detail/${review.tripId}")
                             },
                             style = TextStyle(

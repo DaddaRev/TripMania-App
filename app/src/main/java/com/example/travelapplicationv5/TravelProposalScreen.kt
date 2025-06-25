@@ -62,6 +62,7 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -169,6 +170,7 @@ class TravelProposalScreenViewModel (val model: TripModel, val userModel: UserMo
         if (tripId!=_currentTripId.value){
             _sectionSelected.value = section ?: "trip"
             _currentTripId.value = tripId
+            _expandedStates.value = _expandedStates.value.mapValues { false }.toMutableMap()
         }
         else if (tripId==_currentTripId.value && section!=null && !initialized){
             _sectionSelected.value = section ?: "trip"
@@ -319,6 +321,50 @@ class TravelProposalScreenViewModel (val model: TripModel, val userModel: UserMo
     fun removeSavedTrip(tripId: Int){
         userModel.removeSavedTrip(tripId)
     }
+
+    ////////REVIEW///////////////////////////////////
+
+    private val _selectedImages = MutableStateFlow<List<String>>(emptyList())
+    val selectedImages: StateFlow<List<String>> = _selectedImages
+
+    fun setSelectedImages(images: List<String>) {
+        _selectedImages.value = images
+    }
+
+    private val _expandedStates = MutableStateFlow<Map<Int, Boolean>>(emptyMap())
+    val expandedStates: StateFlow<Map<Int, Boolean>> = _expandedStates
+
+    fun toggleExpanded(reviewId: Int) {
+        _expandedStates.value = _expandedStates.value.toMutableMap().apply {
+            this[reviewId] = !(this[reviewId] ?: false)
+        }
+    }
+
+    fun setExpanded(reviewId: Int, expanded: Boolean) {
+        _expandedStates.value = _expandedStates.value.toMutableMap().apply {
+            this[reviewId] = expanded
+        }
+    }
+
+
+    private val _replyToReviewId = MutableStateFlow<Int?>(null)
+    val replyToReviewId: StateFlow<Int?> = _replyToReviewId
+
+    fun setReplyToReviewId(id: Int?) {
+        _replyToReviewId.value = id
+    }
+
+    private val _replyText = MutableStateFlow("")
+    val replyText: StateFlow<String> = _replyText
+
+    fun setReplyText(text: String) {
+        _replyText.value = text
+    }
+
+    fun resetReply() {
+        _replyText.value = ""
+    }
+
 }
 
 object Factory : ViewModelProvider.Factory {
@@ -1480,13 +1526,12 @@ fun ReviewsSection(navController: NavController, vm: TravelProposalScreenViewMod
     val owned by vm.owned.collectAsState()
     val isLogged by vm.isUserLoggedIn.collectAsState()
 
-    var selectedImages by remember { mutableStateOf<List<String>>(emptyList()) }
+    val selectedImages by vm.selectedImages.collectAsState()
+    val expandedStates by vm.expandedStates.collectAsState()
+    val replyToReviewId by vm.replyToReviewId.collectAsState()
+    val replyText by vm.replyText.collectAsState()
 
-    val expandedStates = remember { mutableStateMapOf<Int, Boolean>() }
-    var replyToReviewId by remember { mutableStateOf<Int?>(null) }
-    var replyText by remember { mutableStateOf("") }
     val focusRequester = remember { FocusRequester() }
-    val focusManager = LocalFocusManager.current
 
     val generalRating = vm.calculateRatingAverage(trip)
 
@@ -1550,23 +1595,24 @@ fun ReviewsSection(navController: NavController, vm: TravelProposalScreenViewMod
                     )
                 }
                 if(review.images.isNotEmpty()){
-                    TextButton(onClick = { selectedImages = review.images }) {
+                    TextButton(onClick = { vm.setSelectedImages(review.images)}) {
                         Text("See photos (${review.images.size})")
                     }
                 }
                 val currentState = expandedStates[review.id] ?: false
                 Row {
-                    if (isCurrentUserAccepted) {
-                        TextButton(onClick = {
-                            replyToReviewId = review.id
-                            replyText = ""
+                    if (isCurrentUserAccepted || owned) {
+                        TextButton(
+                            onClick = {
+                            vm.setReplyToReviewId(review.id)
+                            vm.resetReply()
                         }) {
                             Text("Reply")
                         }
                     }
                     if (review.replies.isNotEmpty()) {
                         TextButton(onClick = {
-                            expandedStates[review.id] = !currentState
+                            vm.toggleExpanded(review.id)
                         }) {
                             Text(if (expandedStates[review.id] == true) "Hide replies" else "Show replies")
                         }
@@ -1582,6 +1628,7 @@ fun ReviewsSection(navController: NavController, vm: TravelProposalScreenViewMod
                                 text = reply.reply,
                                 style = MaterialTheme.typography.bodyMedium
                             )
+                            Spacer(modifier = Modifier.height(8.dp))
                         }
                     }
                 }
@@ -1608,8 +1655,8 @@ fun ReviewsSection(navController: NavController, vm: TravelProposalScreenViewMod
                         )
                         IconButton(
                             onClick = {
-                                replyToReviewId = null
-                                replyText = ""
+                                vm.setReplyToReviewId(null)
+                                vm.resetReply()
                             }
                         ) {
                             Icon(
@@ -1623,7 +1670,7 @@ fun ReviewsSection(navController: NavController, vm: TravelProposalScreenViewMod
                     ) {
                         TextField(
                             value = replyText,
-                            onValueChange = { replyText = it },
+                            onValueChange = { vm.setReplyText(it) },
                             placeholder = { Text("Write your reply...") },
                             modifier = Modifier
                                 .weight(1f)
@@ -1634,9 +1681,9 @@ fun ReviewsSection(navController: NavController, vm: TravelProposalScreenViewMod
                         Button(
                             onClick = {
                                 vm.addReplyReview(trip.id, reviewId, replyText)
-                                expandedStates[reviewId] = true
-                                replyToReviewId = null
-                                replyText = ""
+                                vm.setExpanded(reviewId, true)
+                                vm.setReplyToReviewId(null)
+                                vm.resetReply()
                             },
                             enabled = replyText.isNotBlank(),
                             contentPadding = PaddingValues(horizontal = 12.dp, vertical = 6.dp),
@@ -1724,7 +1771,7 @@ fun ReviewsSection(navController: NavController, vm: TravelProposalScreenViewMod
         // If the user wants to see the photos related to a review --> open a dialog
         if (selectedImages.isNotEmpty()) {
             AlertDialog(
-                onDismissRequest = { selectedImages = emptyList() },
+                onDismissRequest = { vm.setSelectedImages(emptyList()) },
                 title = { Text("Review photos") },
                 text = {
                     LazyRow (
@@ -1749,7 +1796,7 @@ fun ReviewsSection(navController: NavController, vm: TravelProposalScreenViewMod
                     }
                 },
                 confirmButton = {
-                    TextButton(onClick = { selectedImages = emptyList() }) {
+                    TextButton(onClick = { vm.setSelectedImages(emptyList()) }) {
                         Text("Close")
                     }
                 }

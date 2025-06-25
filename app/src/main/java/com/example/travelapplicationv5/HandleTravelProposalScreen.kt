@@ -58,6 +58,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -2069,12 +2070,8 @@ fun TopBar(navController: NavController, show: Boolean = true, initializeHandle:
     val backPressedRecently = remember { mutableStateOf(false) }
     val listPressedRecently = remember { mutableStateOf(false) }
 
-    TopAppBar(
+    CenterAlignedTopAppBar(
         title = {
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ) {
                 Text(
                     text = stringResource(id = R.string.app_name),
                     color = MaterialTheme.colorScheme.onPrimary,
@@ -2093,7 +2090,6 @@ fun TopBar(navController: NavController, show: Boolean = true, initializeHandle:
                         }
                     }
                 )
-            }
         },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primary,
