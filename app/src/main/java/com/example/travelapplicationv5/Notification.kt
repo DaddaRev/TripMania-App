@@ -226,25 +226,28 @@ fun NotificationItem(notification: Notification, viewModel: NotificationsViewMod
             NotificationType.NEW_APPLICATION -> {
                 val user = viewModel.getUserById(notification.relatedUserId.toInt())
                 val trip = viewModel.getTripById(notification.relatedTripId.toInt())
+                val nickname = if (user.id==0) "Deleted user" else user.nickname
                 ImageUserProfile(user)
                 Spacer(modifier = Modifier.width(8.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "${user.nickname} wants to join your trip \"${trip.title}\"",
+                        text = "${nickname} wants to join your trip \"${trip.title}\"",
                         style = MaterialTheme.typography.bodyMedium.copy(fontWeight = fontWeight)
                     )
                 }
                 Spacer(modifier = Modifier.width(8.dp))
-                ImageTrip(trip)
+                if (!trip.images.isEmpty())
+                    ImageTrip(trip)
             }
 
             NotificationType.LAST_MINUTE_PROPOSAL -> {
                 val trip = viewModel.getTripById(notification.relatedTripId.toInt())
+                val triptitle = if (trip.id==0) "deleted" else "\"${trip.title}\""
                 ImageTrip(trip)
                 Spacer(modifier = Modifier.width(8.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Last chance to join \"${trip.title}\"",
+                        text = "Last chance to join ${trip.title}",
                         style = MaterialTheme.typography.bodyMedium.copy(fontWeight = fontWeight)
                     )
                 }
@@ -253,40 +256,47 @@ fun NotificationItem(notification: Notification, viewModel: NotificationsViewMod
             NotificationType.USER_REVIEW_RECEIVED -> {
                 val user = viewModel.getUserById(notification.relatedUserId.toInt())
                 val trip = viewModel.getTripById(notification.relatedTripId.toInt())
+                val nickname = if (user.id==0) "Deleted user" else user.nickname
+                val triptitle = if (trip.id==0) "deleted" else "\"${trip.title}\""
                 ImageUserProfile(user)
                 Spacer(modifier = Modifier.width(8.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "${user.nickname} reviewed you for the trip \"${trip.title}\"",
+                        text = "${nickname} reviewed you for the trip ${triptitle}",
                         style = MaterialTheme.typography.bodyMedium.copy(fontWeight = fontWeight)
                     )
                 }
                 Spacer(modifier = Modifier.width(8.dp))
-                ImageTrip(trip)
+                if (!trip.images.isEmpty())
+                    ImageTrip(trip)
             }
 
             NotificationType.TRIP_REVIEW_RECEIVED -> {
                 val user = viewModel.getUserById(notification.relatedUserId.toInt())
                 val trip = viewModel.getTripById(notification.relatedTripId.toInt())
+                val nickname = if (user.id==0) "Deleted user" else user.nickname
+                val triptitle = if (trip.id==0) "deleted" else "\"${trip.title}\""
                 ImageUserProfile(user)
                 Spacer(modifier = Modifier.width(8.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "${user.nickname} reviewed your trip \"${trip.title}\"",
+                        text = "${nickname} reviewed your trip ${triptitle}",
                         style = MaterialTheme.typography.bodyMedium.copy(fontWeight = fontWeight)
                     )
                 }
                 Spacer(modifier = Modifier.width(8.dp))
-                ImageTrip(trip)
+                if (!trip.images.isEmpty())
+                    ImageTrip(trip)
             }
 
             NotificationType.RECOMMENDED_TRIP -> {
                 val trip = viewModel.getTripById(notification.relatedTripId.toInt())
+                val triptitle = if (trip.id==0) "deleted" else "\"${trip.title}\""
                 ImageTrip(trip)
                 Spacer(modifier = Modifier.width(8.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "We found a trip you might like: \"${trip.title}\"",
+                        text = "We found a trip you might like: ${triptitle}",
                         style = MaterialTheme.typography.bodyMedium.copy(fontWeight = fontWeight)
                     )
                 }
@@ -294,11 +304,12 @@ fun NotificationItem(notification: Notification, viewModel: NotificationsViewMod
 
             NotificationType.APPLICATION_ACCEPTED -> {
                 val trip = viewModel.getTripById(notification.relatedTripId.toInt())
+                val triptitle = if (trip.id==0) "deleted" else "\"${trip.title}\""
                 ImageTrip(trip)
                 Spacer(modifier = Modifier.width(8.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Your application to the trip \"${trip.title}\" has been accepted",
+                        text = "Your application to the trip ${triptitle} has been accepted",
                         style = MaterialTheme.typography.bodyMedium.copy(fontWeight = fontWeight)
                     )
                 }
@@ -306,11 +317,12 @@ fun NotificationItem(notification: Notification, viewModel: NotificationsViewMod
 
             NotificationType.APPLICATION_REFUSED ->  {
                 val trip = viewModel.getTripById(notification.relatedTripId.toInt())
+                val triptitle = if (trip.id==0) "deleted" else "\"${trip.title}\""
                 ImageTrip(trip)
                 Spacer(modifier = Modifier.width(8.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "Your application to the trip \"${trip.title}\" has been refused",
+                        text = "Your application to the trip ${triptitle} has been refused",
                         style = MaterialTheme.typography.bodyMedium.copy(fontWeight = fontWeight)
                     )
                 }
@@ -319,17 +331,19 @@ fun NotificationItem(notification: Notification, viewModel: NotificationsViewMod
             NotificationType.APPLICATION_REMOVED -> {
                 val user = viewModel.getUserById(notification.relatedUserId.toInt())
                 val trip = viewModel.getTripById(notification.relatedTripId.toInt())
+                val nickname = if (user.id==0) "Deleted user" else user.nickname
+                val triptitle = if (trip.id==0) "deleted" else "\"${trip.title}\""
                 ImageUserProfile(user)
                 Spacer(modifier = Modifier.width(8.dp))
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
-                        text = "${user.nickname} has left your trip \"${trip.title}\"",
+                        text = "${nickname} has left your trip ${triptitle}",
                         style = MaterialTheme.typography.bodyMedium.copy(fontWeight = fontWeight)
                     )
                 }
                 Spacer(modifier = Modifier.width(8.dp))
-                ImageTrip(trip)
-
+                if (!trip.images.isEmpty())
+                    ImageTrip(trip)
             }
         }
     }
