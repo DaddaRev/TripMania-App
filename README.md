@@ -1,6 +1,6 @@
-# ✈️ **SharedTrip** — *Mobile Travel Experience*
+# ✈️ **TripMania** — *Mobile Travel Experience*
 
-**SharedTrip** is a mobile app designed for people who love traveling together. It combines social features, group trip organization, and a collaborative travel experience in a clean and minimalist interface.
+**TripMania** is a mobile app designed for people who love traveling together. It combines social features, group trip organization, and a collaborative travel experience in a clean and minimalist interface.
 
 ---
 
@@ -23,7 +23,7 @@
 
 ---
 
-## 🌍 What SharedTrip Offers
+## 🌍 What TripMania Offers
 
 An app designed to make organizing and experiencing group trips **easy and fun**:
 
@@ -52,7 +52,7 @@ Each user can register, manage their personal profile, earn experience badges, a
 
 1. Clone the repository:  
    ```bash
-   git clone https://github.com/your-username/sharedtrip.git
+   git clone https://github.com/DaddaRev/TripMania-App.git
     ```
 
 2. Add your `google-services.json` file inside the `app/` directory  
