@@ -13,3 +13,10 @@
 .externalNativeBuild
 .cxx
 local.properties
+google-services.json
+.idea/
+*.iml
+*.jks
+*.keystore
+.gradle/
+.kotlin
