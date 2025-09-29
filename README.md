@@ -44,7 +44,7 @@ Each user can register, manage their personal profile, earn experience badges, a
 
 ## Screenshots
 
-*(Add screenshots of your app here to showcase the main screens)*
+*(Screenshots will be available soon)*
 
 ---
 
