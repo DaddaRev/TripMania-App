@@ -1,10 +1,10 @@
-# ✈️ **TripMania** — *Mobile Travel Experience*
+# **TripMania** — *Mobile Travel Experience*
 
 **TripMania** is a mobile app designed for people who love traveling together. It combines social features, group trip organization, and a collaborative travel experience in a clean and minimalist interface.
 
 ---
 
-## 🌟 Main Features
+## Main Features
 
 - Minimalist and intuitive design  
 - Step-by-step trip creation  
@@ -23,7 +23,7 @@
 
 ---
 
-## 🌍 What TripMania Offers
+## What TripMania Offers
 
 An app designed to make organizing and experiencing group trips **easy and fun**:
 
@@ -36,19 +36,19 @@ An app designed to make organizing and experiencing group trips **easy and fun**
 
 ---
 
-## 🔐 Authentication & Profile
+## Authentication & Profile
 
 Each user can register, manage their personal profile, earn experience badges, and save favorite trips.
 
 ---
 
-## 📱 Screenshots
+## Screenshots
 
 *(Add screenshots of your app here to showcase the main screens)*
 
 ---
 
-## ⚙️ Installation
+## Installation
 
 1. Clone the repository:  
    ```bash
@@ -64,7 +64,7 @@ Each user can register, manage their personal profile, earn experience badges, a
 
 ---
 
-## 📦 Tech Stack
+## Tech Stack
 
 - Android (Kotlin)
 - Firebase Authentication
@@ -75,7 +75,7 @@ Each user can register, manage their personal profile, earn experience badges, a
 
 ---
 
-## 🛡️ Security Notice
+## Security Notice
 
 The `google-services.json` file is intentionally excluded from the repository to protect sensitive Firebase service credentials.  
 Each developer working on this project must configure their own Firebase project and place the corresponding `google-services.json` in the `app/` directory.
@@ -88,7 +88,7 @@ To avoid accidental commits, the following rule is included in `.gitignore`:
 
 ---
 
-## 🎬 Demo Video
+## Demo Video
 
 The video can be downloaded from the following link:  
 [▶️ Watch Demo](https://drive.google.com/file/d/1NFEcDkjrgU7sBa2AcjW09lAMd0E33xS3/view?usp=drive_link)
@@ -102,7 +102,7 @@ We hope you enjoy the experience and travel more — together. 🌍
 
 ---
 
-## 👥 Authors
+## Authors
 
 - [Davide Reverberi](https://github.com/DaddaRev) 
 - [Gabry323387](https://github.com/Gabry323387)
